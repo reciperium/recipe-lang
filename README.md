@@ -33,3 +33,4 @@ Enjoy!
 
 File format: `.recp` (/re c p/) reads like recipe
 
+Check more examples in the [examples folder](./examples/).

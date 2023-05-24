@@ -4,7 +4,7 @@ use nom::{
         complete::tag,
         complete::{take_till1, take_until, take_while1},
     },
-    character::complete::{char, space0},
+    character::complete::{char, line_ending, multispace0, space0},
     combinator::{map, opt},
     multi::many1,
     sequence::{delimited, pair, preceded, terminated},
@@ -96,6 +96,22 @@ fn parse_metadata(i: &str) -> IResult<&str, (&str, &str)> {
     )(i)
 }
 
+/// The backstory is separated by `---`, and it consumes till the end
+/// ```recp
+/// my recipe bla with {ingredient1}
+/// ---
+/// This recipe was given by my grandma
+/// ```
+fn parse_backstory(i: &str) -> IResult<&str, &str> {
+    let (tail, _) = delimited(
+        preceded(line_ending, multispace0),
+        tag("---"),
+        preceded(line_ending, multispace0),
+    )(i)?;
+    // We use directly the tail to return everything
+    Ok(("", tail))
+}
+
 #[derive(Debug)]
 pub enum Token<'a> {
     Metadata {
@@ -111,13 +127,18 @@ pub enum Token<'a> {
     Word(&'a str),
     Space(&'a str),
     Comment(&'a str),
+    Backstory(&'a str),
 }
 
 impl Display for Token<'_> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
             Token::Ingredient { name, amount: _ } => write!(f, "{}", name),
-            Token::Timer(v) | Token::Material(v) | Token::Word(v) | Token::Space(v) => {
+            Token::Backstory(v)
+            | Token::Timer(v)
+            | Token::Material(v)
+            | Token::Word(v)
+            | Token::Space(v) => {
                 write!(f, "{}", v)
             }
             Token::Metadata { key: _, value: _ } => Ok(()),
@@ -126,6 +147,21 @@ impl Display for Token<'_> {
     }
 }
 
+/// It returns a list with the parsed tokens
+///
+/// This function is useful if you want to build your own render on
+/// top of recipe-lang
+///
+/// Example:
+///
+/// ```
+/// use recipe_lang::parse;
+///
+/// let input = "Take the {potatoe}(1) and boil it";
+/// let result = parse(input).expect("recipe could not be parsed");
+///
+/// println!("{result:?}");
+/// ```
 pub fn parse(i: &str) -> IResult<&str, Vec<Token>> {
     many1(alt((
         map(parse_metadata, |(key, value)| Token::Metadata {
@@ -140,6 +176,7 @@ pub fn parse(i: &str) -> IResult<&str, Vec<Token>> {
             name,
             amount,
         }),
+        map(parse_backstory, |v| Token::Backstory(v)),
         map(parse_comment, |v| Token::Comment(v)),
         map(parse_word, |v| Token::Word(v)),
         map(parse_space, |v| Token::Space(v)),
@@ -247,6 +284,25 @@ mod test {
         let (_, comment) = parse_comment(input).expect("failed to parse comment");
         assert_eq!(comment, expected)
     }
+
+    #[rstest]
+    #[case("\n---\nwhat a backstory", "what a backstory")]
+    #[case("\n   ---\nwhat a backstory", "what a backstory")]
+    #[case("\n   ---\n\nwhat a backstory", "what a backstory")]
+    #[case("\n   ---\n\nthis is **markdown**", "this is **markdown**")]
+    #[case("\n   ---\n\nthis is [markdown](url)", "this is [markdown](url)")]
+    fn test_parse_backstory_ok(#[case] input: &str, #[case] expected: &str) {
+        let (_, backsotry) = parse_backstory(input).expect("failed to parse backstory");
+        assert_eq!(backsotry, expected)
+    }
+
+    #[rstest]
+    #[case("\n---    \nwhat a backstory")]
+    fn test_parse_backstory_fail(#[case] input: &str) {
+        let out = parse_backstory(input);
+        assert!(out.is_err())
+    }
+
     #[test]
     fn test_parse_ok() {
         let input = "Boil the quinoa for t{5 minutes} in a m{pot}.\nPut the boiled {quinoa}(200gr) in the base of the bowl.";
@@ -262,7 +318,7 @@ mod test {
 
     #[test]
     fn test_parse_meta_ok() {
-        let input = "Boil the quinoa for t{5 minutes} in a m{pot}.\nPut the boiled {quinoa}(200gr) in the base of the bowl.";
+        let input = ">> name: story\nBoil the quinoa for t{5 minutes} in a m{pot}.\nPut the boiled {quinoa}(200gr) in the base of the bowl.";
         let expected = "Boil the quinoa for 5 minutes in a pot.\nPut the boiled quinoa in the base of the bowl.";
         let (_, recipe) = parse(input).expect("parsing recipe failed");
         let fmt_recipe = recipe
@@ -270,7 +326,7 @@ mod test {
             .fold(String::new(), |acc, val| format!("{acc}{val}"));
         println!("{}", fmt_recipe);
 
-        assert_eq!(expected, fmt_recipe)
+        assert_eq!(expected, fmt_recipe.trim())
     }
 
     #[test]

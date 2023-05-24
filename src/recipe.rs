@@ -2,33 +2,34 @@ use std::collections::HashMap;
 
 use serde::{Deserialize, Serialize};
 
-use crate::{parser::Token, parse};
+use crate::{parse, parser::Token};
 
 #[derive(Debug, Serialize, Deserialize)]
-struct Ingredient {
+pub struct Ingredient {
     name: String,
     amount: Option<String>,
     unit: Option<String>,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
-struct Timer {
+pub struct Timer {
     duration: String,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
-struct Material {
+pub struct Material {
     name: String,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
-struct Recipe {
+pub struct Recipe {
     name: Option<String>,
     metadata: HashMap<String, String>,
     ingredients: Vec<Ingredient>,
     timers: Vec<Timer>,
     materials: Vec<Material>,
     instructions: String,
+    backstory: Option<String>,
 }
 
 impl From<Vec<Token<'_>>> for Recipe {
@@ -38,7 +39,7 @@ impl From<Vec<Token<'_>>> for Recipe {
         let mut timers = Vec::new();
         let mut materials = Vec::new();
         let mut instructions = String::new();
-
+        let mut backstory = String::new();
         for token in tokens {
             let display_token = format!("{}", token);
             instructions.push_str(&display_token);
@@ -51,7 +52,7 @@ impl From<Vec<Token<'_>>> for Recipe {
                     let i = Ingredient {
                         name: name.to_string(),
                         amount: amount.map(|v| v.to_string()),
-                        unit: None
+                        unit: None,
                     };
                     ingredients.push(i);
                 }
@@ -61,6 +62,7 @@ impl From<Vec<Token<'_>>> for Recipe {
                 Token::Material(material) => materials.push(Material {
                     name: material.to_string(),
                 }),
+                Token::Backstory(bs) => backstory.push_str(bs),
                 _ => {}
             };
         }
@@ -73,6 +75,13 @@ impl From<Vec<Token<'_>>> for Recipe {
             timers,
             materials,
             metadata,
+            backstory: {
+                if backstory.is_empty() {
+                    None
+                } else {
+                    Some(backstory)
+                }
+            },
         }
     }
 }
@@ -83,17 +92,11 @@ impl TryFrom<&str> for Recipe {
     fn try_from(value: &str) -> Result<Self, Self::Error> {
         let tokens = parse(value.trim());
         match tokens {
-            Ok((_, tokens)) => {
-                Ok(tokens.into())
-            },
-            Err(err) => {
-                Err(err.to_string())
-            },
+            Ok((_, tokens)) => Ok(tokens.into()),
+            Err(err) => Err(err.to_string()),
         }
     }
 }
-
-
 
 #[cfg(test)]
 mod test {
@@ -113,8 +116,7 @@ mod test {
         println!("{recipe:?}");
 
         let serialized = serde_json::to_string_pretty(&recipe).unwrap();
-        println!("{serialized}" );
-
+        println!("{serialized}");
     }
 
     #[test]
@@ -134,8 +136,29 @@ mod test {
         println!("{recipe:?}");
 
         let serialized = serde_json::to_string_pretty(&recipe).unwrap();
-        println!("{serialized}" );
-
+        println!("{serialized}");
     }
 
+    #[test]
+    fn test_recipe_with_backstory_ok() {
+        let recipe = "
+        >> name: Potatoes a la Jean-Claude
+        >> tags: vegan
+        >> servings: 2
+        Preheat the oven to 180 C.
+        Cut the {red potatoes}(500gr) into fourths.
+        Put them in a m{bowl}, then add the {garlic}(8), add {oil},
+        {salt}, {pepper} and {rosemary} to your likeing.
+        Mix everything and place them on an oven plate.
+        Roast for t{20 minutes}, then mix it and roast for another t{20 minutes}.
+        Enjoy!
+        ---
+        Old recipe from my grandpa
+        ";
+        let recipe = Recipe::try_from(recipe).expect("recipe did not work");
+        println!("{recipe:?}");
+
+        let serialized = serde_json::to_string_pretty(&recipe).unwrap();
+        println!("{serialized}");
+    }
 }

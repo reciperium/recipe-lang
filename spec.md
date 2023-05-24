@@ -80,3 +80,31 @@ Metadata is relevant information of a recipe that doesn't make the recipe itself
 >> servings: 2
 >> tags: vegan, easy
 ```
+
+### Backstory
+
+It's common for a recipe to have a backstory, for example: your family recipe for tomatoe sauce, or your mother taught you how to build a cabin, etc.
+
+Recipe-lang considers important to keep track of the history, notes, stores of recipes.
+
+In order to add a `backstory`, the user should provide 3 dashes (`---`) without spaces in between, surrounded by new lines `\n` (`\n---\n`) and optionally spaces, so this is valid: `\n   ---- \n`.
+
+Everything after the `---` will be taken as backstory till the end of the recipe (eof).
+
+Let's take a look at this example recipe:
+
+```recp
+Add {tomatoes}(200gr) to a m{pot} with spices: {pepper}, {salt}, {oregano}.
+Boil  for t{1 hour}.
+Add {basilicum} at will.
+Use a m{mixer} to bring everything together.
+Let it sit in the fridge for t{2 hours}
+
+---
+
+I learnt this recipe while traveling around Italy (2016), in a town called Sorrento
+```
+
+We can see that the `---` are separating the backstory from the actual recipe.
+
+The backstory **should** use [commonMark](https://spec.commonmark.org/) (A strongly defined, highly compatible specification of Markdown).
