@@ -22,7 +22,11 @@ fn parse_valid_string(i: &str) -> IResult<&str, &str> {
 /// /* */
 /// ```
 fn parse_comment(i: &str) -> IResult<&str, &str> {
-    delimited(tag("/*"), map(take_until("*/"), |v: &str| v.trim()), tag("*/"))(i)
+    delimited(
+        tag("/*"),
+        map(take_until("*/"), |v: &str| v.trim()),
+        preceded(tag("*/"), space0),
+    )(i)
 }
 
 /// Parse curly braces delimited utf-8
@@ -260,6 +264,19 @@ mod test {
     fn test_parse_meta_ok() {
         let input = "Boil the quinoa for t{5 minutes} in a m{pot}.\nPut the boiled {quinoa}(200gr) in the base of the bowl.";
         let expected = "Boil the quinoa for 5 minutes in a pot.\nPut the boiled quinoa in the base of the bowl.";
+        let (_, recipe) = parse(input).expect("parsing recipe failed");
+        let fmt_recipe = recipe
+            .iter()
+            .fold(String::new(), |acc, val| format!("{acc}{val}"));
+        println!("{}", fmt_recipe);
+
+        assert_eq!(expected, fmt_recipe)
+    }
+
+    #[test]
+    fn test_recipe_with_comment_ok() {
+        let input = "Boil the {quinoa} /* don't do it! */ for t{5 minutes}";
+        let expected = "Boil the quinoa for 5 minutes";
         let (_, recipe) = parse(input).expect("parsing recipe failed");
         let fmt_recipe = recipe
             .iter()
