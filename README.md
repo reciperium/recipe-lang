@@ -18,7 +18,7 @@ For example:
 
 To learn more read the [specification](./spec.md)
 
-File format: `.recp` (/re c p/) reads like recipe.
+File extension: `.recp` (/re c p/) reads like recipe.
 
 ## Sample
 
