@@ -2,6 +2,9 @@
 
 > Write recipes in a human readable and machine parseable language
 
+> **Warning**
+> Recipe lang is in it's infancy
+
 ## About
 
 Recipe Lang aims to be a general language to describe recipes of any kind (food, art, construction, etc.).
