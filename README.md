@@ -23,6 +23,14 @@ File extension: `.recp` (/re c p/) reads like recipe.
 ## Sample
 
 ```recp
+Take {potatoes}(3) and wrap them in m{aluminium foil}.
+Throw them in the fire of the grill
+Wait for t{1 hour}
+```
+
+## Longer sample
+
+```recp
 >> name: Potatoes a la Jean-Claude
 >> tags: vegan
 >> servings: 2
@@ -36,7 +44,7 @@ Roast for t{20 minutes}, then mix it and roast for another t{20 minutes}.
 Enjoy!
 ```
 
-In a file called: `recipes/potatoes-ala-jean-claude.recp`
+In a file called: `potatoes-ala-jean-claude.recp`
 
 ## Features
 
