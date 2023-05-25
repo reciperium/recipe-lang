@@ -161,4 +161,14 @@ mod test {
         let serialized = serde_json::to_string_pretty(&recipe).unwrap();
         println!("{serialized}");
     }
+
+    #[test]
+    fn test_invalid_recipes() {
+        let invalid_recipe = "
+        >>> name: invalid-recipe
+        this is an {invalid recipe
+        ";
+        let recipe = Recipe::try_from(invalid_recipe);
+        println!("{recipe:?}");
+    }
 }

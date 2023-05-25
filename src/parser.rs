@@ -5,7 +5,8 @@ use nom::{
         complete::{take_till1, take_until, take_while1},
     },
     character::complete::{char, line_ending, multispace0, space0},
-    combinator::{map, opt},
+    combinator::{cut, map, opt},
+    error::context,
     multi::many1,
     sequence::{delimited, pair, preceded, terminated},
     IResult,
@@ -36,12 +37,20 @@ fn parse_comment(i: &str) -> IResult<&str, &str> {
 /// {tomatoes}
 /// ```
 fn parse_curly(i: &str) -> IResult<&str, &str> {
-    delimited(char('{'), parse_valid_string, char('}'))(i)
+    delimited(
+        char('{'),
+        map(parse_valid_string, |v| v.trim()),
+        context("missing closing }", cut(char('}'))),
+    )(i)
 }
 
 /// Ingredient amounts are surrounded by parenthesis
 fn parse_ingredient_amount(i: &str) -> IResult<&str, &str> {
-    delimited(tag("("), parse_valid_string, tag(")"))(i)
+    delimited(
+        tag("("),
+        parse_valid_string,
+        context("missing closing )", cut(tag(")"))),
+    )(i)
 }
 
 /// Ingredients come in these formats:
@@ -210,6 +219,7 @@ mod test {
     #[case("{black pepper}", "black pepper")]
     #[case("{smashed potatoes}", "smashed potatoes")]
     #[case("{15 minutes}", "15 minutes")]
+    #[case("{   15 minutes  }", "15 minutes")]
     fn test_parse_curly_ok(#[case] input: &str, #[case] expected: &str) {
         let (_, content) = parse_curly(input).expect("to work");
         assert_eq!(expected, content);
@@ -217,9 +227,13 @@ mod test {
 
     #[rstest]
     #[case("{}")]
+    #[case("{unclosed")]
     fn test_parse_curly_wrong(#[case] input: &str) {
         let res = parse_curly(input);
+        println!("{res:?}");
         assert!(res.is_err());
+        let err = res.unwrap_err();
+        println!("{}", err.to_string());
     }
 
     #[rstest]
@@ -231,6 +245,17 @@ mod test {
     fn test_parse_ingredient_amount_ok(#[case] input: &str, #[case] expected: &str) {
         let (_, content) = parse_ingredient_amount(input).expect("to work");
         assert_eq!(expected, content);
+    }
+
+    #[rstest]
+    #[case("()")]
+    #[case("(unclosed")]
+    fn test_parse_ingredient_amount_wrong(#[case] input: &str) {
+        let res = parse_ingredient_amount(input);
+
+        println!("{res:?}");
+        assert!(res.is_err());
+        let err = res.unwrap_err();
     }
 
     #[rstest]
@@ -340,5 +365,16 @@ mod test {
         println!("{}", fmt_recipe);
 
         assert_eq!(expected, fmt_recipe)
+    }
+
+    #[test]
+    fn test_invalid_recipes() {
+        let input = "this is an {invalid recipe";
+        let result = parse(input);
+        assert!(result.is_err());
+        println!("{result:?}");
+        let err = result.unwrap_err();
+
+        println!("type: {:?}", err);
     }
 }

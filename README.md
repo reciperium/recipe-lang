@@ -1,8 +1,11 @@
 # Recipe Lang (recp)
 
+[LOGO HERE]()
+
 > Write recipes in a human readable and machine parseable language
 
 > **Warning**
+>
 > Recipe lang is in it's infancy
 
 ## About
