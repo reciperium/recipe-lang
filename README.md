@@ -1,6 +1,6 @@
 # Recipe Lang (recp)
 
-[LOGO HERE]()
+[LOGO HERE](https://github.com/reciperium/recipe-lang/issues/1)
 
 > Write recipes in a human readable and machine parseable language
 
