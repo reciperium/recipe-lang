@@ -29,8 +29,9 @@ On top of that, we can start adding different categories by adding a prefix to t
 
 Ingredients should be surrounded by curly braces `{}`. Inside you can have any utf-8 value.
 After the curly braces `{}`, the amount can be optionally added, which should be surrounded by parenthesis `()`. There is no separation between the curly braces and parenthesis `{}()`.
-Amount starts with a number, and it's optionally preceded by a utf-8 text after a space.
-This text correlates with a unit.
+The **amount** is composed by **quantity** and **unit**, which are both optional.
+The **quantity** represents a numerical value like: `1` or `1/2`.
+The **unit** represents a system of measurement, e.g: `kg`, `grams`, `cup`. The preferred system is to use the SI (International System of Units), which is the metric system.
 
 ```
 {salt}
@@ -38,6 +39,7 @@ This text correlates with a unit.
 {water}(200 ml)
 {black pepper}(1 pinch)
 {smashed potatoes}(200 gr)
+{water}(1/2 cup)
 ```
 
 ### Timer
@@ -83,9 +85,9 @@ Metadata is relevant information of a recipe that doesn't make the recipe itself
 
 ### Backstory
 
-It's common for a recipe to have a backstory, for example: your family recipe for tomatoe sauce, or your mother taught you how to build a cabin, etc.
+It's common for a recipe to have a backstory, for example: your family recipe for tomato sauce, or a family member taught you how to build a cabin, etc.
 
-Recipe-lang considers important to keep track of the history, notes, stores of recipes.
+Recipe-lang considers important to keep track of the history, notes, stories of recipes.
 
 In order to add a `backstory`, the user should provide 3 dashes (`---`) without spaces in between, surrounded by new lines `\n` (`\n---\n`) and optionally spaces, so this is valid: `\n   ---- \n`.
 
@@ -105,6 +107,9 @@ Let it sit in the fridge for t{2 hours}
 I learnt this recipe while traveling around Italy (2016), in a town called Sorrento
 ```
 
-We can see that the `---` are separating the backstory from the actual recipe.
+The backstory in this case would be parsed as:
+> I learnt this recipe while traveling around Italy (2016), in a town called Sorrento
+
+We can see how the `---` is separating the backstory from the actual recipe.
 
 The backstory **should** use [commonMark](https://spec.commonmark.org/) (A strongly defined, highly compatible specification of Markdown).

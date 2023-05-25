@@ -5,11 +5,11 @@ use nom::{
         complete::{take_till1, take_until, take_while1},
     },
     character::complete::{char, line_ending, multispace0, space0},
-    combinator::{cut, map, opt},
+    combinator::{cut, map, opt, verify},
     error::context,
     multi::many1,
     sequence::{delimited, pair, preceded, terminated},
-    IResult,
+    AsChar, IResult,
 };
 use std::fmt::Display;
 
@@ -39,16 +39,49 @@ fn parse_comment(i: &str) -> IResult<&str, &str> {
 fn parse_curly(i: &str) -> IResult<&str, &str> {
     delimited(
         char('{'),
-        map(parse_valid_string, |v| v.trim()),
+        map(cut(parse_valid_string), |v| v.trim()),
         context("missing closing }", cut(char('}'))),
     )(i)
 }
 
+/// The amount of an ingredient must be numeric
+/// with a few symbols allowed.
+/// ```recp
+/// 1
+/// 3.2
+/// 3,2
+/// 3_000_000
+/// 2/3
+/// ```
+fn parse_quantity(i: &str) -> IResult<&str, &str> {
+    let spaces_and_symbols = ".,/_";
+    context(
+        "not a valid amount",
+        cut(verify(
+            take_while1(move |c: char| c.is_numeric() || spaces_and_symbols.contains(c)),
+            |s: &str| {
+                // NEXT: Can this be improved?
+                let has_repeated_symbols = s
+                    .as_bytes()
+                    .windows(2)
+                    .any(|v| v[0] == v[1] && spaces_and_symbols.contains(v[0].as_char()));
+                let last_char = &s[s.len() - 1..];
+                !spaces_and_symbols.contains(last_char) && !has_repeated_symbols
+            },
+        )),
+    )(i)
+}
+
+/// Parse units like kg, kilograms, pinch, etc.
+fn parse_unit(i: &str) -> IResult<&str, &str> {
+    parse_valid_string(i)
+}
+
 /// Ingredient amounts are surrounded by parenthesis
-fn parse_ingredient_amount(i: &str) -> IResult<&str, &str> {
+fn parse_ingredient_amount(i: &str) -> IResult<&str, (Option<&str>, Option<&str>)> {
     delimited(
         tag("("),
-        parse_valid_string,
+        pair(opt(parse_quantity), opt(preceded(space0, parse_unit))),
         context("missing closing )", cut(tag(")"))),
     )(i)
 }
@@ -59,7 +92,7 @@ fn parse_ingredient_amount(i: &str) -> IResult<&str, &str> {
 /// {tomatoes}(2)
 /// {sweet potatoes}(2)
 /// ```
-fn parse_ingredient(i: &str) -> IResult<&str, (&str, Option<&str>)> {
+fn parse_ingredient(i: &str) -> IResult<&str, (&str, Option<(Option<&str>, Option<&str>)>)> {
     pair(parse_curly, opt(parse_ingredient_amount))(i)
 }
 
@@ -129,7 +162,8 @@ pub enum Token<'a> {
     },
     Ingredient {
         name: &'a str,
-        amount: Option<&'a str>,
+        quantity: Option<&'a str>,
+        unit: Option<&'a str>,
     },
     Timer(&'a str),
     Material(&'a str),
@@ -142,7 +176,11 @@ pub enum Token<'a> {
 impl Display for Token<'_> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            Token::Ingredient { name, amount: _ } => write!(f, "{}", name),
+            Token::Ingredient {
+                name,
+                quantity: _,
+                unit: _,
+            } => write!(f, "{}", name),
             Token::Backstory(v)
             | Token::Timer(v)
             | Token::Material(v)
@@ -181,9 +219,19 @@ pub fn parse(i: &str) -> IResult<&str, Vec<Token>> {
         map(parse_timer, |t| Token::Timer(t)),
         // Because ingredient doesn't have a prefix before the curly braces, e.g: `m{}`
         // it must always be parsed after timer and material
-        map(parse_ingredient, |(name, amount)| Token::Ingredient {
-            name,
-            amount,
+        map(parse_ingredient, |(name, amount)| {
+            let mut quantity = None;
+            let mut unit = None;
+            if let Some((_quantity, _unit)) = amount {
+                quantity = _quantity;
+                unit = _unit;
+            };
+
+            Token::Ingredient {
+                name,
+                quantity,
+                unit,
+            }
         }),
         map(parse_backstory, |v| Token::Backstory(v)),
         map(parse_comment, |v| Token::Comment(v)),
@@ -230,19 +278,44 @@ mod test {
     #[case("{unclosed")]
     fn test_parse_curly_wrong(#[case] input: &str) {
         let res = parse_curly(input);
-        println!("{res:?}");
         assert!(res.is_err());
+
         let err = res.unwrap_err();
-        println!("{}", err.to_string());
+        assert!(matches!(err, nom::Err::Failure(_)));
     }
 
     #[rstest]
-    #[case("(200gr)", "200gr")]
-    #[case("(1/2)", "1/2")]
-    #[case("(100 gr)", "100 gr")]
-    #[case("(10 ml)", "10 ml")]
-    #[case("(1.5 cups)", "1.5 cups")]
-    fn test_parse_ingredient_amount_ok(#[case] input: &str, #[case] expected: &str) {
+    #[case("200", "200")]
+    #[case("2.1", "2.1")]
+    #[case("2_1", "2_1")]
+    #[case("2,1", "2,1")]
+    #[case("2.1", "2.1")]
+    #[case("1/2", "1/2")]
+    #[case(".2", ".2")]
+    fn test_parse_quantity_ok(#[case] input: &str, #[case] expected: &str) {
+        let (_, content) = parse_quantity(input).expect("to work");
+        assert_eq!(expected, content);
+    }
+
+    #[rstest]
+    #[case("2.")]
+    #[case("2..0")]
+    #[case("2,,0")]
+    #[case("2//0")]
+    fn test_parse_quantity_invalid(#[case] input: &str) {
+        // TODO: Add verify function to validate the last char
+        let res = parse_quantity(input);
+        let err = res.unwrap_err();
+        assert!(matches!(err, nom::Err::Failure(_)));
+    }
+
+    #[rstest]
+    #[case("(200gr)", (Some("200"), Some("gr")))]
+    #[case("(1/2)", (Some("1/2"), None))]
+    #[case("(100 gr)", (Some("100"), Some("gr")))]
+    #[case("(10 ml)", (Some("10"), Some("ml")))]
+    #[case("(1.5 cups)", (Some("1.5"), Some("cups")))]
+    fn test_parse_ingredient_amount_ok(#[case] input: &str, #[case] expected: (Option<&str>, Option<&str>)) {
         let (_, content) = parse_ingredient_amount(input).expect("to work");
         assert_eq!(expected, content);
     }
@@ -259,12 +332,12 @@ mod test {
     }
 
     #[rstest]
-    #[case("{sweet potato}(200gr)", "sweet potato", Some("200gr"))]
+    #[case("{sweet potato}(200gr)", "sweet potato", Some((Some("200"),Some("gr"))))]
     #[case("{sweet potato}", "sweet potato", None)]
     fn test_parse_ingredient_ok(
         #[case] input: &str,
         #[case] expected_ingredient: &str,
-        #[case] expected_amount: Option<&str>,
+        #[case] expected_amount: Option<(Option<&str>, Option<&str>)>,
     ) {
         let (_, (ingredient, amount)) = parse_ingredient(input).unwrap();
         assert_eq!(expected_ingredient, ingredient);

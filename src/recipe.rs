@@ -7,7 +7,7 @@ use crate::{parse, parser::Token};
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Ingredient {
     name: String,
-    amount: Option<String>,
+    quantity: Option<String>,
     unit: Option<String>,
 }
 
@@ -48,11 +48,11 @@ impl From<Vec<Token<'_>>> for Recipe {
                 Token::Metadata { key, value } => {
                     metadata.insert(key.to_string(), value.to_string());
                 }
-                Token::Ingredient { name, amount } => {
+                Token::Ingredient { name, quantity, unit } => {
                     let i = Ingredient {
                         name: name.to_string(),
-                        amount: amount.map(|v| v.to_string()),
-                        unit: None,
+                        quantity: quantity.map(|v| v.to_string()),
+                        unit: unit.map(|v| v.to_string()),
                     };
                     ingredients.push(i);
                 }
