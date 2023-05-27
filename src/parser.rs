@@ -98,12 +98,12 @@ fn parse_ingredient(i: &str) -> IResult<&str, (&str, Option<(Option<&str>, Optio
 
 /// Materials format:
 /// ```recp
-/// m{pot}
-/// m{small jar}
-/// m{stick}
+/// &{pot}
+/// &{small jar}
+/// &{stick}
 /// ```
 fn parse_material(i: &str) -> IResult<&str, &str> {
-    preceded(tag("m"), parse_curly)(i)
+    preceded(tag("&"), parse_curly)(i)
 }
 
 /// Materials format:
@@ -238,7 +238,7 @@ pub fn parse(i: &str) -> IResult<&str, Vec<Token>> {
         }),
         map(parse_material, |m| Token::Material(m)),
         map(parse_timer, |t| Token::Timer(t)),
-        // Because ingredient doesn't have a prefix before the curly braces, e.g: `m{}`
+        // Because ingredient doesn't have a prefix before the curly braces, e.g: `&{}`
         // it must always be parsed after timer and material
         map(parse_ingredient, |(name, amount)| {
             let mut quantity = None;
@@ -383,10 +383,10 @@ mod test {
     }
 
     #[rstest]
-    #[case("m{pot}", "pot")]
-    #[case("m{small jar}", "small jar")]
-    #[case("m{stick}", "stick")]
-    #[case("m{bricks}", "bricks")]
+    #[case("&{pot}", "pot")]
+    #[case("&{small jar}", "small jar")]
+    #[case("&{stick}", "stick")]
+    #[case("&{bricks}", "bricks")]
     fn test_parse_material_ok(#[case] input: &str, #[case] expected: &str) {
         let (_, material) = parse_material(input).expect("Failed to parse material");
         assert_eq!(material, expected)
@@ -455,7 +455,7 @@ mod test {
 
     #[test]
     fn test_parse_ok() {
-        let input = "Boil the quinoa for t{5 minutes} in a m{pot}.\nPut the boiled {quinoa}(200gr) in the base of the bowl.";
+        let input = "Boil the quinoa for t{5 minutes} in a &{pot}.\nPut the boiled {quinoa}(200gr) in the base of the bowl.";
         let expected = "Boil the quinoa for 5 minutes in a pot.\nPut the boiled quinoa in the base of the bowl.";
         let (_, recipe) = parse(input).expect("parsing recipe failed");
         let fmt_recipe = recipe
@@ -468,7 +468,7 @@ mod test {
 
     #[test]
     fn test_parse_meta_ok() {
-        let input = ">> name: story\nBoil the quinoa for t{5 minutes} in a m{pot}.\nPut the boiled {quinoa}(200gr) in the base of the bowl.";
+        let input = ">> name: story\nBoil the quinoa for t{5 minutes} in a &{pot}.\nPut the boiled {quinoa}(200gr) in the base of the bowl.";
         let expected = "Boil the quinoa for 5 minutes in a pot.\nPut the boiled quinoa in the base of the bowl.";
         let (_, recipe) = parse(input).expect("parsing recipe failed");
         let fmt_recipe = recipe

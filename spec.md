@@ -36,7 +36,7 @@ On top of that, we can start adding different categories by adding a prefix to t
 Boil {tomatoes}(3), {onion}(1) and {garlic}(3) for t{1 hour} in {water}(500 ml) with
 {olive oil}(2 tbsp).
 Add {oregano}, {basil}, {salt} and {pepper} at will.
-Blend everything together using a m{hand blender}.
+Blend everything together using a &{hand blender}.
 Let it sit in the fridge for t{1 hour}
 
 ---
@@ -71,12 +71,12 @@ t{25 minutes}
 
 ## Materials
 
-Materials are similar to ingredients, we use curly braces, but prefixed with an `m`, like `m{material name}`
+Materials are similar to ingredients, we use curly braces, but prefixed with an `&` (ampersand), like `&{material name}`
 
 ```recp
-m{pot}
-m{small jar}
-m{stick}
+&{pot}
+&{small jar}
+&{stick}
 ```
 
 ### Comments
@@ -130,10 +130,10 @@ Everything after the `---` will be taken as backstory till the end of the recipe
 Let's take a look at this example recipe:
 
 ```recp
-Add {tomatoes}(200gr) to a m{pot} with spices: {pepper}, {salt}, {oregano}.
+Add {tomatoes}(200gr) to a &{pot} with spices: {pepper}, {salt}, {oregano}.
 Boil  for t{1 hour}.
 Add {basilicum} at will.
-Use a m{mixer} to bring everything together.
+Use a &{mixer} to bring everything together.
 Let it sit in the fridge for t{2 hours}
 
 ---

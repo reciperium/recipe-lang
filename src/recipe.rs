@@ -119,7 +119,7 @@ mod test {
     #[test]
     fn test_recipe_ok() {
         let recipe = ">> name: buddha bowl
-        Put the boiled {quinoa}(200gr) in the base of the m{bowl}.
+        Put the boiled {quinoa}(200gr) in the base of the &{bowl}.
         We are going to add 3 ingredients on top: fat, protein and minerals.
         Stir fry {tofu}(200gr) and add them on one side of the bowl.
         Boil {sweet potatoes}(100 gr) for t{10 minutes} and add them on a side of the bowl.
@@ -141,7 +141,7 @@ mod test {
         >> servings: 2
         Preheat the oven to 180 C.
         Cut the {red potatoes}(500gr) into fourths.
-        Put them in a m{bowl}, then add the {garlic}(8), add {oil},
+        Put them in a &{bowl}, then add the {garlic}(8), add {oil},
         {salt}, {pepper} and {rosemary} to your likeing.
         Mix everything and place them on an oven plate.
         Roast for t{20 minutes}, then mix it and roast for another t{20 minutes}.
@@ -161,7 +161,7 @@ mod test {
         >> servings: 2
         Preheat the oven to 180 C.
         Cut the {red potatoes}(500gr) into fourths.
-        Put them in a m{bowl}, then add the {garlic}(8), add {oil},
+        Put them in a &{bowl}, then add the {garlic}(8), add {oil},
         {salt}, {pepper} and {rosemary} to your likeing.
         Mix everything and place them on an oven plate.
         Roast for t{20 minutes}, then mix it and roast for another t{20 minutes}.

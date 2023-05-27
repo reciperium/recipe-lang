@@ -26,7 +26,7 @@ File extension: `.recp` (/re c p/) reads like recipe.
 ## Sample
 
 ```recp
-Take {potatoes}(3) and wrap them in m{aluminium foil}.
+Take {potatoes}(3) and wrap them in &{aluminium foil}.
 Throw them in the fire of the grill
 Wait for t{1 hour}
 ```
@@ -40,7 +40,7 @@ Wait for t{1 hour}
 
 Preheat the oven to 180 C.
 Cut the {red potatoes}(500gr) into fourths.
-Put them in a m{bowl}, then add the {garlic}(8), add {oil},
+Put them in a &{bowl}, then add the {garlic}(8), add {oil},
 {salt}, {pepper} and {rosemary} to your liking.
 Mix everything and place them on an oven plate.
 Roast for t{20 minutes}, then mix it and roast for another t{20 minutes}.
@@ -54,7 +54,7 @@ In a file called: `potatoes-ala-jean-claude.recp`
 Recipe lang supports:
 
 - Ingredients with the tag `{ingredient_name}` or with amount: `{ingredient_name}(200gr)`
-- Materials: `m{pot}`
+- Materials: `&{pot}`
 - Timers: `t{15 minutes}`
 - Recipe links: `@{woile/tomato-sauce}` (NOT IMPLEMENTED YET)
 - Metadata: with `>> tags: abc, easy, high-fiber`
