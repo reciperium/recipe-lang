@@ -5,13 +5,13 @@ use nom::{
         complete::{take_till1, take_until, take_while1},
     },
     character::complete::{char, line_ending, multispace0, space0},
-    combinator::{cut, map, opt, verify},
+    combinator::{cut, map, opt, rest, verify},
     error::context,
     multi::many1,
     sequence::{delimited, pair, preceded, terminated},
     AsChar, IResult,
 };
-use std::fmt::Display;
+use std::{fmt::Display, path::Path};
 
 fn parse_valid_string(i: &str) -> IResult<&str, &str> {
     let spaces_and_symbols = "\t /-_@.,%#'";
@@ -115,6 +115,15 @@ fn parse_timer(i: &str) -> IResult<&str, &str> {
     preceded(tag("t"), parse_curly)(i)
 }
 
+/// Parse a reference to another recipe
+/// ```recp
+/// @{woile/special-tomato-sauce}
+/// @{woile/special-tomato-sauce}(100 ml)
+/// ```
+fn parse_recipe_ref(i: &str) -> IResult<&str, (&str, Option<(Option<&str>, Option<&str>)>)> {
+    preceded(tag("@"), pair(parse_curly, opt(parse_ingredient_amount)))(i)
+}
+
 /// We separate the tokens into words
 fn parse_word(i: &str) -> IResult<&str, &str> {
     let multispace = " \t\r\n";
@@ -145,13 +154,14 @@ fn parse_metadata(i: &str) -> IResult<&str, (&str, &str)> {
 /// This recipe was given by my grandma
 /// ```
 fn parse_backstory(i: &str) -> IResult<&str, &str> {
-    let (tail, _) = delimited(
-        preceded(line_ending, multispace0),
-        tag("---"),
-        preceded(line_ending, multispace0),
-    )(i)?;
-    // We use directly the tail to return everything
-    Ok(("", tail))
+    preceded(
+        delimited(
+            preceded(line_ending, multispace0),
+            tag("---"),
+            preceded(line_ending, multispace0),
+        ),
+        rest,
+    )(i)
 }
 
 #[derive(Debug)]
@@ -161,6 +171,12 @@ pub enum Token<'a> {
         value: &'a str,
     },
     Ingredient {
+        name: &'a str,
+        quantity: Option<&'a str>,
+        unit: Option<&'a str>,
+    },
+    // Reference to another recipe
+    RecipeRef {
         name: &'a str,
         quantity: Option<&'a str>,
         unit: Option<&'a str>,
@@ -181,6 +197,11 @@ impl Display for Token<'_> {
                 quantity: _,
                 unit: _,
             } => write!(f, "{}", name),
+            Token::RecipeRef {
+                name,
+                quantity: _,
+                unit: _,
+            } => write!(f, "\"{}\"", name),
             Token::Backstory(v)
             | Token::Timer(v)
             | Token::Material(v)
@@ -228,6 +249,20 @@ pub fn parse(i: &str) -> IResult<&str, Vec<Token>> {
             };
 
             Token::Ingredient {
+                name,
+                quantity,
+                unit,
+            }
+        }),
+        map(parse_recipe_ref, |(name, amount)| {
+            let mut quantity = None;
+            let mut unit = None;
+            if let Some((_quantity, _unit)) = amount {
+                quantity = _quantity;
+                unit = _unit;
+            };
+
+            Token::RecipeRef {
                 name,
                 quantity,
                 unit,
@@ -315,7 +350,10 @@ mod test {
     #[case("(100 gr)", (Some("100"), Some("gr")))]
     #[case("(10 ml)", (Some("10"), Some("ml")))]
     #[case("(1.5 cups)", (Some("1.5"), Some("cups")))]
-    fn test_parse_ingredient_amount_ok(#[case] input: &str, #[case] expected: (Option<&str>, Option<&str>)) {
+    fn test_parse_ingredient_amount_ok(
+        #[case] input: &str,
+        #[case] expected: (Option<&str>, Option<&str>),
+    ) {
         let (_, content) = parse_ingredient_amount(input).expect("to work");
         assert_eq!(expected, content);
     }
@@ -359,6 +397,20 @@ mod test {
     fn test_parse_timer_ok(#[case] input: &str, #[case] expected: &str) {
         let (_, timer) = parse_timer(input).expect("Failed to parse timer");
         assert_eq!(timer, expected)
+    }
+
+    #[rstest]
+    #[case("@{woile/tomato-sauce}(200gr)", "woile/tomato-sauce", Some((Some("200"),Some("gr"))))]
+    #[case("@{woile/tomato-sauce}", "woile/tomato-sauce", None)]
+    #[case("@{special stew}", "special stew", None)]
+    fn test_parse_recipe_ok(
+        #[case] input: &str,
+        #[case] expected_recipe: &str,
+        #[case] expected_amount: Option<(Option<&str>, Option<&str>)>,
+    ) {
+        let (_, (recipe, amount)) = parse_recipe_ref(input).unwrap();
+        assert_eq!(expected_recipe, recipe);
+        assert_eq!(expected_amount, amount);
     }
 
     #[rstest]
@@ -449,5 +501,16 @@ mod test {
         let err = result.unwrap_err();
 
         println!("type: {:?}", err);
+    }
+
+    #[test]
+    fn test_recipe_with_recipe_reference() {
+        let input = "use the @{woile/magic-hummus}(200gr)";
+        let expected = "use the \"woile/magic-hummus\"";
+        let (_, recipe) = parse(input).unwrap();
+        let fmt_recipe = recipe
+            .iter()
+            .fold(String::new(), |acc, val| format!("{acc}{val}"));
+        assert_eq!(expected, fmt_recipe)
     }
 }

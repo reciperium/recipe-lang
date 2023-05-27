@@ -24,6 +24,25 @@ The idea is to use `{}` around a word or a set of words, e.g: `{spring onions}`,
 
 On top of that, we can start adding different categories by adding a prefix to the `{}`, which would have a different meaning, e.g: for a timer: `t{20 minutes}`, and there's a huge number of symbols and letters we can use to convey new things for machines to be able to read.
 
+### Complete sample
+
+`woile-tomato-sauce.recp`
+
+```recp
+>> name: woile tomato sauce
+>> lang: en-US
+>> tags: easy, tasty
+
+Boil {tomatoes}(3), {onion}(1) and {garlic}(3) for t{1 hour} in {water}(500 ml) with
+{olive oil}(2 tbsp).
+Add {oregano}, {basil}, {salt} and {pepper} at will.
+Blend everything together using a m{hand blender}.
+Let it sit in the fridge for t{1 hour}
+
+---
+
+I developed this recipe while living in Amsterdam
+```
 
 ### Ingredients
 
@@ -72,6 +91,21 @@ The comments can be placed anywhere
 Take the {tomatoes}(2) and /* TODO: Update recipe later */ move
 them to bla
 ```
+
+### Recipe references
+
+You can link to other recipes by using the `@{}` tag.
+
+For example, if we want to link to the sample provided at the beginning:
+
+```recp
+Heat @{woile-tomato-sauce}(200 ml) in a pan
+```
+
+The values used should be relative URL's or relative paths. URL path if you are inside an app, or
+a relative path if in your folder.
+
+It should be displayed using the name of the recipe in the file or url.
 
 ### Metadata
 

@@ -11,6 +11,8 @@ pub struct Ingredient {
     unit: Option<String>,
 }
 
+type RecipeRef = Ingredient;
+
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Timer {
     duration: String,
@@ -26,6 +28,7 @@ pub struct Recipe {
     name: Option<String>,
     metadata: HashMap<String, String>,
     ingredients: Vec<Ingredient>,
+    recipes_refs: Vec<RecipeRef>,
     timers: Vec<Timer>,
     materials: Vec<Material>,
     instructions: String,
@@ -36,6 +39,7 @@ impl From<Vec<Token<'_>>> for Recipe {
     fn from(tokens: Vec<Token>) -> Self {
         let mut metadata = HashMap::new();
         let mut ingredients = Vec::new();
+        let mut recipes_refs = Vec::new();
         let mut timers = Vec::new();
         let mut materials = Vec::new();
         let mut instructions = String::new();
@@ -55,7 +59,16 @@ impl From<Vec<Token<'_>>> for Recipe {
                         unit: unit.map(|v| v.to_string()),
                     };
                     ingredients.push(i);
-                }
+                },
+                Token::RecipeRef { name, quantity, unit } => {
+                    let i = RecipeRef {
+                        name: name.to_string(),
+                        quantity: quantity.map(|v| v.to_string()),
+                        unit: unit.map(|v| v.to_string()),
+                    };
+                    recipes_refs.push(i);
+                },
+
                 Token::Timer(t) => timers.push(Timer {
                     duration: t.to_string(),
                 }),
@@ -75,6 +88,7 @@ impl From<Vec<Token<'_>>> for Recipe {
             timers,
             materials,
             metadata,
+            recipes_refs,
             backstory: {
                 if backstory.is_empty() {
                     None
