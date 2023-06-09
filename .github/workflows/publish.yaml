@@ -1,0 +1,21 @@
+# This is not part of release.yaml because it is not managed by cargo-dist
+name: Publish to crates.io
+
+on:
+  push:
+    tags:
+      - '*-?v[0-9]+*'
+
+jobs:
+  crate-publish:
+    runs-on: ubuntu-latest
+    name: "Publish crates to crates.io"
+    steps:
+    - uses: actions/checkout@v3
+    - uses: actions-rs/toolchain@v1
+      with:
+          toolchain: stable
+          override: true
+    - uses: katyo/publish-crates@v2
+      with:
+          registry-token: ${{ secrets.CRATES_TOKEN }}
