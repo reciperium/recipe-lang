@@ -1,17 +1,17 @@
 [package]
-name = "recipepe"
-version = "0.1.0"
-edition = "2021"
+name = "recp"
 description = "A cli utility to display recipes in recipe-lang"
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+version = { workspace = true }
+edition = { workspace = true }
+license = { workspace = true }
+repository = { workspace = true }
+readme = { workspace = true }
+homepage = { workspace = true }
+categories = ["command-line-utilities"]
 
 [dependencies]
 Inflector = "0.11.4"
 clap = { version = "4.3.1", features = ["derive"] }
-recipe-parser = { path = "../recipe-parser"}
+recipe-parser = { path = "../recipe-parser" }
 console = "0.15.7"
 tabwriter = "1.2.1"
-serde = { version = "1.0", features = ["derive"] }
-
-[dev-dependencies]
-serde_json = "1.0"

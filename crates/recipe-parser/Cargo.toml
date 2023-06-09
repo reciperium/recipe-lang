@@ -4,6 +4,11 @@ version = { workspace = true }
 edition = { workspace = true }
 description = { workspace = true }
 keywords = { workspace = true }
+license = { workspace = true }
+repository = { workspace = true }
+readme = { workspace = true }
+homepage = { workspace = true }
+categories = ["command-line-interface", "parser-implementations"]
 
 [dependencies]
 nom = "7.1.3"

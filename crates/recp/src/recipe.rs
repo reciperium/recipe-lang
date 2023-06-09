@@ -1,9 +1,8 @@
-use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 
 use recipe_parser::{parse, Token};
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Clone, Eq, PartialEq)]
 pub struct Ingredient {
     pub name: String,
     pub quantity: Option<String>,
@@ -12,17 +11,17 @@ pub struct Ingredient {
 
 type RecipeRef = Ingredient;
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Clone, Eq, PartialEq)]
 pub struct Timer {
     pub duration: String,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Clone, Eq, PartialEq)]
 pub struct Material {
     pub name: String,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone, Eq, PartialEq)]
 pub struct Recipe<'a> {
     pub name: Option<String>,
     pub metadata: HashMap<String, String>,

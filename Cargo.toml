@@ -9,3 +9,7 @@ version = "0.1.0"
 edition = "2021"
 description = "Write recipes in a human readable and machine parseable language"
 keywords = ["recipes", "cooking", "markup-language", "recipe-lang"]
+license = "MIT"
+repository = "https://github.com/reciperium/recipe-lang"
+readme = "README.md"
+homepage = "https://github.com/reciperium/recipe-lang"

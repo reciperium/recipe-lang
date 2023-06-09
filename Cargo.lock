@@ -405,15 +405,13 @@ dependencies = [
 ]
 
 [[package]]
-name = "recipepe"
+name = "recp"
 version = "0.1.0"
 dependencies = [
  "Inflector",
  "clap",
  "console",
  "recipe-parser",
- "serde",
- "serde_json",
  "tabwriter",
 ]
 

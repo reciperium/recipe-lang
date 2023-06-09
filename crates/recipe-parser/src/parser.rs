@@ -164,7 +164,7 @@ fn parse_backstory(i: &str) -> IResult<&str, &str> {
     )(i)
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Eq, PartialEq, Hash)]
 pub enum Token<'a> {
     Metadata {
         key: &'a str,
@@ -223,7 +223,7 @@ impl Display for Token<'_> {
 /// Example:
 ///
 /// ```
-/// use recipe_lang::parse;
+/// use recipe_parser::parse;
 ///
 /// let input = "Take the {potatoe}(1) and boil it";
 /// let result = parse(input).expect("recipe could not be parsed");
