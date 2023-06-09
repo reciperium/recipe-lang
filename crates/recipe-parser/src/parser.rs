@@ -11,7 +11,7 @@ use nom::{
     sequence::{delimited, pair, preceded, terminated},
     AsChar, IResult,
 };
-use std::{fmt::Display, path::Path};
+use std::fmt::Display;
 
 fn parse_valid_string(i: &str) -> IResult<&str, &str> {
     let spaces_and_symbols = "\t /-_@.,%#'";
@@ -164,7 +164,7 @@ fn parse_backstory(i: &str) -> IResult<&str, &str> {
     )(i)
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum Token<'a> {
     Metadata {
         key: &'a str,

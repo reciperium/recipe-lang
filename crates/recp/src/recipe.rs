@@ -1,43 +1,44 @@
-use std::collections::HashMap;
+use std::{collections::HashMap};
 
 use serde::{Deserialize, Serialize};
 
-use crate::{parse, parser::Token};
+use recipe_parser::{parse, Token};
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Ingredient {
-    name: String,
-    quantity: Option<String>,
-    unit: Option<String>,
+    pub name: String,
+    pub quantity: Option<String>,
+    pub unit: Option<String>,
 }
 
 type RecipeRef = Ingredient;
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Timer {
-    duration: String,
+    pub duration: String,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Material {
-    name: String,
+    pub name: String,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Recipe {
-    name: Option<String>,
-    metadata: HashMap<String, String>,
-    ingredients: Vec<Ingredient>,
-    recipes_refs: Vec<RecipeRef>,
-    timers: Vec<Timer>,
-    materials: Vec<Material>,
-    instructions: String,
-    backstory: Option<String>,
+    pub name: Option<String>,
+    pub metadata: HashMap<String, String>,
+    pub ingredients: Vec<Ingredient>,
+    pub recipes_refs: Vec<RecipeRef>,
+    pub timers: Vec<Timer>,
+    pub materials: Vec<Material>,
+    pub instructions: String,
+    pub backstory: Option<String>,
 }
 
 impl From<Vec<Token<'_>>> for Recipe {
     fn from(tokens: Vec<Token>) -> Self {
         let mut metadata = HashMap::new();
+
         let mut ingredients = Vec::new();
         let mut recipes_refs = Vec::new();
         let mut timers = Vec::new();
