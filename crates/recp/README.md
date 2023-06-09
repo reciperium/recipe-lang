@@ -6,7 +6,9 @@ See [recipe-lang](../../spec.md)
 
 ## Installation
 
-TODO
+```sh
+cargo install recp
+```
 
 ## Usage
 
