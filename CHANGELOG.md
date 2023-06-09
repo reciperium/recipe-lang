@@ -1,0 +1,22 @@
+## v0.2.0 (2023-06-09)
+
+### BREAKING CHANGE
+
+- `m` for materials was replaced by `&` because reading a material prefixed with an `m` doesn't read well. For eexample `m{bowl}` is mentally read as `mbowl` when compared to the silent `&{bowl}`. To migrate replace in your recipes the `m{` for `&{`
+
+### Feat
+
+- add recipe cli `recp`
+- add recipe references
+- add parser for amout (quantity + unit)
+- add backstory section
+- recipe parser
+
+### Fix
+
+- prepare for release
+- improve display of instructions
+- use `&` insetad if `m` for materials
+- fail on unclosed curly and paren
+- update description in cargo
+- parse end of comment and spaces to prevent multi spaces
