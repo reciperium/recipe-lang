@@ -1,4 +1,5 @@
 use console::style;
+use recipe_parser::Token;
 use std::{fs, path::PathBuf};
 
 use clap::{Parser, Subcommand};
@@ -59,7 +60,13 @@ fn main() {
                             ing.unit.unwrap_or_default()
                         );
                         let mut tw = TabWriter::new(vec![]).minwidth(32).padding(10);
-                        write!(&mut tw, "  {}\t{}", style(ing.name).magenta().bold(), amount).unwrap();
+                        write!(
+                            &mut tw,
+                            "  {}\t{}",
+                            style(ing.name).magenta().bold(),
+                            amount
+                        )
+                        .unwrap();
                         tw.flush().unwrap();
                         let written = String::from_utf8(tw.into_inner().unwrap()).unwrap();
                         println!("{}", written);
@@ -67,7 +74,30 @@ fn main() {
                     }
                 }
                 println!("\n\n{}\n", style("Instructions").underlined().bold());
-                println!("{}", recipe.instructions);
+                let instru: String = recipe.instructions.iter().filter_map(|instruct| {
+                    match instruct {
+                        Token::Metadata { key: _, value: _ } => None,
+                        Token::Ingredient {
+                            name,
+                            quantity: _,
+                            unit: _,
+                        } => Some(format!("{}", style(name).cyan().bold())),
+                        Token::RecipeRef {
+                            name,
+                            quantity: _,
+                            unit: _,
+                        } => Some(format!("{}", style(name).magenta())),
+                        Token::Timer(v) => Some(format!("{}", style(v).red().bold())),
+                        Token::Material(v) => Some(format!("{}", style(v).yellow())),
+                        Token::Word(v) | Token::Space(v) => Some(format!("{v}")),
+
+                        Token::Comment(_) => None,
+                        Token::Backstory(_) => None,
+                    }
+                }).collect();
+
+                println!("{}", instru.trim())
+                // println!("{}", recipe.instructions);
             }
         }
     }

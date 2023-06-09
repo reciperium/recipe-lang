@@ -366,7 +366,7 @@ mod test {
 
         println!("{res:?}");
         assert!(res.is_err());
-        let err = res.unwrap_err();
+        // let err = res.unwrap_err();
     }
 
     #[rstest]
