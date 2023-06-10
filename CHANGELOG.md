@@ -1,3 +1,9 @@
+## v0.2.1 (2023-06-10)
+
+### Fix
+
+- flake improvements
+
 ## v0.2.0 (2023-06-09)
 
 ### BREAKING CHANGE
