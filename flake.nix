@@ -16,7 +16,6 @@
       inputs = {
         nixpkgs.follows = "nixpkgs";
         dream2nix.follows = "dream2nix";
-        # dream2nix.inputs.crane.follows = "crane";
       };
     };
     flake-parts = {
@@ -35,7 +34,7 @@
         # 3. Add here: foo.flakeModule
         nci.flakeModule
       ];
-      systems = [ "x86_64-linux" "aarch64-darwin" ];
+      systems = [ "x86_64-linux" "aarch64-darwin" "x86_64-darwin" ];
       perSystem = { config, self', inputs', pkgs, system, ... }: {
         # Per-system attributes can be defined here. The self' and inputs'
         # module parameters provide easy access to attributes of the same
@@ -58,11 +57,5 @@
         # export the release package of the crate as default package
         packages.default = config.nci.outputs."recp".packages.release;
       };
-      # flake = {
-      #   # The usual flake attributes can be defined here, including system-
-      #   # agnostic ones like nixosModule and system-enumerating ones, although
-      #   # those are more easily expressed in perSystem.
-
-      # };
     };
 }

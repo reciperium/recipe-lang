@@ -3,7 +3,8 @@ name = "recp"
 description = "A cli utility to display recipes in recipe-lang"
 version = { workspace = true }
 edition = { workspace = true }
-license = { workspace = true }
+# license = { workspace = true }
+license = "MIT"
 repository = { workspace = true }
 readme = { workspace = true }
 homepage = { workspace = true }
