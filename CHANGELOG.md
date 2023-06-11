@@ -1,3 +1,9 @@
+## v0.2.3 (2023-06-11)
+
+### Fix
+
+- flake with cargo workspace dependencies
+
 ## v0.2.2 (2023-06-11)
 
 ### Fix
