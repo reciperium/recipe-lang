@@ -7,7 +7,7 @@ members = [
 [workspace.package]
 version = "0.2.2"
 edition = "2021"
-description = "Write recipes in a human readable and machine parseable language"
+description = "Write recipes understood by humans and machines"
 keywords = ["recipes", "cooking", "markup-language", "recipe-lang"]
 license = "MIT"
 repository = "https://github.com/reciperium/recipe-lang"

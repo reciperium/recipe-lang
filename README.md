@@ -2,7 +2,7 @@
 
 [LOGO HERE](https://github.com/reciperium/recipe-lang/issues/1)
 
-> Write recipes in a human readable and machine parseable language
+> Write recipes understood by humans and machines
 
 > **Warning**
 >
@@ -23,7 +23,6 @@ To learn more read the [specification](./spec.md)
 
 File extension: `.recp` (/re c p/) reads like recipe.
 
-## Sample
 
 ```recp
 Take {potatoes}(3) and wrap them in &{aluminium foil}.
@@ -31,23 +30,21 @@ Throw them in the fire of the grill
 Wait for t{1 hour}
 ```
 
-## Longer sample
+## Installation
 
-```recp
->> name: Potatoes a la Jean-Claude
->> tags: vegan
->> servings: 2
+### Nix
 
-Preheat the oven to 180 C.
-Cut the {red potatoes}(500gr) into fourths.
-Put them in a &{bowl}, then add the {garlic}(8), add {oil},
-{salt}, {pepper} and {rosemary} to your liking.
-Mix everything and place them on an oven plate.
-Roast for t{20 minutes}, then mix it and roast for another t{20 minutes}.
-Enjoy!
+On Mac or Linux you can run:
+
+```sh
+nix profile install 'github:reciperium/recipe-lang#recp'
 ```
 
-In a file called: `potatoes-ala-jean-claude.recp`
+### Cargo
+
+```sh
+cargo install recp
+```
 
 ## Features
 
@@ -65,3 +62,53 @@ Check more examples in the [examples folder](./examples/).
 
 
 A VSCode extension is in the works.
+
+## Sample
+
+```recp
+>> name: Potatoes a la Jean-Claude
+>> tags: vegan
+>> servings: 2
+
+Preheat the oven to 180 C.
+Cut the {red potatoes}(500gr) into fourths.
+Put them in a &{bowl}, then add the {garlic}(8), add {oil},
+{salt}, {pepper} and {rosemary} to your liking.
+Mix everything and place them on an oven plate.
+Roast for t{20 minutes}, then mix it and roast for another t{20 minutes}.
+Enjoy!
+```
+
+In a file called: `potatoes-ala-jean-claude.recp`
+
+We can the read this recipe with the `recp` cli:
+
+```sh
+recp show potatoes-ala-jean-claude.recp
+```
+
+It will show
+
+```
+Potatoes A La Jean Claude
+
+Ingredients
+
+  red potatoes                  500 gr
+  garlic                        8
+  oil
+  salt
+  pepper
+  rosemary
+
+
+Instructions
+
+Preheat the oven to 180 C.
+Cut the red potatoes into fourths.
+Put them in a bowl, then add the garlic, add oil,
+salt, pepper and rosemary to your liking.
+Mix everything and place them on an oven plate.
+Roast for 20 minutes, then mix it and roast for another 20 minutes.
+Enjoy!
+```

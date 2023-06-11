@@ -1,6 +1,5 @@
 {
   description = "Recipe management cli";
-
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
     crane = {
@@ -56,6 +55,7 @@
         devShells.default = config.nci.outputs."recipe-lang".devShell;
         # export the release package of the crate as default package
         packages.default = config.nci.outputs."recp".packages.release;
+        packages.recp = config.nci.outputs."recp".packages.release;
       };
     };
 }

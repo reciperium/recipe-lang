@@ -6,6 +6,16 @@ See [recipe-lang](../../spec.md)
 
 ## Installation
 
+### Nix
+
+On Mac or Linux you can run:
+
+```sh
+nix profile install 'github:reciperium/recipe-lang#recp'
+```
+
+### Cargo
+
 ```sh
 cargo install recp
 ```

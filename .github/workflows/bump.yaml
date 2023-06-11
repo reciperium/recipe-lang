@@ -20,3 +20,15 @@ jobs:
         uses: commitizen-tools/commitizen-action@master
         with:
           github_token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
+      - uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+      - name: Update Cargo.lock
+        uses: actions-rs/cargo@v1
+        with:
+          command: generate-lockfile
+      - name: Commit and push Cargo.lock
+        run: |
+          git add Cargo.lock
+          git commit -m 'ci: update Cargo.lock'
+          git push
