@@ -396,7 +396,7 @@ dependencies = [
 
 [[package]]
 name = "recipe-parser"
-version = "0.2.2"
+version = "0.2.3"
 dependencies = [
  "nom",
  "rstest",
@@ -406,7 +406,7 @@ dependencies = [
 
 [[package]]
 name = "recp"
-version = "0.2.2"
+version = "0.2.3"
 dependencies = [
  "Inflector",
  "clap",
