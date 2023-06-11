@@ -29,6 +29,7 @@ jobs:
           command: generate-lockfile
       - name: Commit and push Cargo.lock
         run: |
+          ls -l .git/COMMIT_EDITMSG
           git config --global --add safe.directory "*"
           git config --local user.name 'github-actions[bot]'
           git config --local user.email 'github-actions[bot]@users.noreply.github.com'
