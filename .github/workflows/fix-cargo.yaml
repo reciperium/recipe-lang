@@ -1,0 +1,42 @@
+# This action fixes an issue with Nix, crates, and cargo
+# Recp is a crate that depends on `recipe-parser`, another crate
+# But in order to use `recipe-parser` in crates.io we need to specify the version
+# To update the version, we use .cz.toml
+# when the version is updated, the Cargo.lock is not, and when you try to install
+# using nix, things go wrong.
+# This action updates the lock file when they are bumped
+# Because it's using the GITHUB_TOKEN, it doesn't trigger any workflow
+name: Fix cargo for nix
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  bump-version:
+    if: "startsWith(github.event.head_commit.message, 'bump:')"
+    runs-on: ubuntu-latest
+    name: "Bump version and create changelog with commitizen"
+    steps:
+      - name: Check out
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+          token: "${{ secrets.GITHUB_TOKEN }}"
+      - uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+      - name: Update Cargo.lock
+        uses: actions-rs/cargo@v1
+        with:
+          command: generate-lockfile
+      - name: Commit and push Cargo.lock
+        run: |
+          rm -rf .git/COMMIT_EDITMSG``
+          git config --global --add safe.directory "*"
+          git config --global user.name 'github-actions[bot]'
+          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+          git add Cargo.lock
+          git commit -m 'ci: update Cargo.lock'
+          git push
