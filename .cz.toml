@@ -2,7 +2,7 @@
 name = "cz_conventional_commits"
 tag_format = "v$version"
 version_type = "semver"
-version = "0.2.7"
+version = "0.2.8"
 update_changelog_on_bump = true
 major_version_zero = true
 version_files = [

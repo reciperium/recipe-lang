@@ -1,3 +1,9 @@
+## v0.2.8 (2023-06-11)
+
+### Fix
+
+- grant write permissions
+
 ## v0.2.7 (2023-06-11)
 
 ### Fix
