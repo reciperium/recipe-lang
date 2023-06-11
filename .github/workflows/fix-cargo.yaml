@@ -18,6 +18,9 @@ jobs:
     if: "startsWith(github.event.head_commit.message, 'bump:')"
     runs-on: ubuntu-latest
     name: "Bump version and create changelog with commitizen"
+    permissions:
+      actions: write
+      contents: write
     steps:
       - name: Check out
         uses: actions/checkout@v3
