@@ -1,3 +1,9 @@
+## v0.2.4 (2023-06-11)
+
+### Fix
+
+- ci git configuration on bump
+
 ## v0.2.3 (2023-06-11)
 
 ### Fix
