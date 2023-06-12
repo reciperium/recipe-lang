@@ -60,8 +60,7 @@ Recipe lang supports:
 
 Check more examples in the [examples folder](./examples/).
 
-
-A VSCode extension is in the works.
+[Vs Code Extension](https://marketplace.visualstudio.com/items?itemName=woile.recipe-lang)
 
 ## Sample
 
