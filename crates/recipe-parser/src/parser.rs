@@ -2,7 +2,7 @@ use nom::{
     branch::alt,
     bytes::{
         complete::tag,
-        complete::{take_till1, take_until, take_while1},
+        complete::{take_till1, take_until, take_while1, take_till},
     },
     character::complete::{char, line_ending, multispace0, space0},
     combinator::{cut, map, opt, rest, verify},
@@ -124,7 +124,11 @@ fn parse_recipe_ref(i: &str) -> IResult<&str, (&str, Option<(Option<&str>, Optio
     preceded(tag("@"), pair(parse_curly, opt(parse_ingredient_amount)))(i)
 }
 
-/// We separate the tokens into words
+
+fn parse_special_char(i: &str) -> IResult<&str, &str> {
+    tag("(")(i)
+}
+/// Tokens are separated into words
 fn parse_word(i: &str) -> IResult<&str, &str> {
     let multispace = " \t\r\n";
     take_till1(move |c| multispace.contains(c))(i)
@@ -270,6 +274,7 @@ pub fn parse(i: &str) -> IResult<&str, Vec<Token>> {
         }),
         map(parse_backstory, |v| Token::Backstory(v)),
         map(parse_comment, |v| Token::Comment(v)),
+        map(parse_special_char, |v| Token::Word(v)),
         map(parse_word, |v| Token::Word(v)),
         map(parse_space, |v| Token::Space(v)),
     )))(i)
@@ -458,6 +463,21 @@ mod test {
         let input = "Boil the quinoa for t{5 minutes} in a &{pot}.\nPut the boiled {quinoa}(200gr) in the base of the bowl.";
         let expected = "Boil the quinoa for 5 minutes in a pot.\nPut the boiled quinoa in the base of the bowl.";
         let (_, recipe) = parse(input).expect("parsing recipe failed");
+        let fmt_recipe = recipe
+            .iter()
+            .fold(String::new(), |acc, val| format!("{acc}{val}"));
+        println!("{}", fmt_recipe);
+
+        assert_eq!(expected, fmt_recipe)
+    }
+
+    #[rstest]
+    #[case("({chickpea flour}(200gr))", "(chickpea flour)")]
+    #[case("(t{5 min})", "(5 min)")]
+    #[case("(&{fork})", "(fork)")]
+    fn test_parse_ingredient_in_paren(#[case] input: &str, #[case] expected: &str) {
+        let (_, recipe) = parse(input).expect("parsing recipe failed");
+        println!("{:?}", recipe);
         let fmt_recipe = recipe
             .iter()
             .fold(String::new(), |acc, val| format!("{acc}{val}"));
