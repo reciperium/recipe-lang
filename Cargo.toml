@@ -5,7 +5,7 @@ members = [
 ]
 
 [workspace.package]
-version = "0.2.8"
+version = "0.2.9"
 edition = "2021"
 description = "Write recipes understood by humans and machines"
 keywords = ["recipes", "cooking", "markup-language", "recipe-lang"]

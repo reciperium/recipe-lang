@@ -1,3 +1,9 @@
+## v0.2.9 (2023-11-06)
+
+### Fix
+
+- parse parenthesis as word properly
+
 ## v0.2.8 (2023-06-11)
 
 ### Fix
