@@ -1,3 +1,9 @@
+## v0.3.1 (2023-11-10)
+
+### Fix
+
+- update cargo-dist to rust 1.73
+
 ## v0.3.0 (2023-11-10)
 
 ### Feat
