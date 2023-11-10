@@ -1,3 +1,9 @@
+## v0.3.0 (2023-11-10)
+
+### Feat
+
+- add flakestry release
+
 ## v0.2.9 (2023-11-06)
 
 ### Fix
