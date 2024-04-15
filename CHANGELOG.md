@@ -1,3 +1,14 @@
+## v0.4.0 (2024-04-15)
+
+### Feat
+
+- migrate from nom to winnow
+
+### Fix
+
+- clean flake
+- use cargo resolver 2
+
 ## v0.3.1 (2023-11-10)
 
 ### Fix
