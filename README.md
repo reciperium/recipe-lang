@@ -6,7 +6,7 @@
 
 > **Warning**
 >
-> Recipe lang is in it's infancy
+> Recipe lang is in its infancy
 
 ## About
 

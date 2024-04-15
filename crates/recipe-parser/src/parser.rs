@@ -2,7 +2,7 @@ use std::fmt::Display;
 
 use winnow::ascii::{line_ending, multispace0, space0};
 use winnow::combinator::{
-    alt, cut_err, delimited, eof, iterator, opt, preceded, repeat, repeat_till, rest, terminated, ParserIterator
+    alt, cut_err, delimited, eof, opt, preceded, repeat_till, rest,
 };
 use winnow::error::{ContextError, ParseError, StrContext, StrContextValue};
 use winnow::token::{take_till, take_until, take_while};
@@ -34,7 +34,7 @@ fn parse_comment<'a>(input: &mut Input<'a>) -> PResult<&'a str> {
         cut_err(take_until(0.., "*/"))
             .context(StrContext::Expected(StrContextValue::StringLiteral("*/")))
             .map(|v: &str| v.trim()),
-        preceded("*/", space0),
+        ("*/", space0),
     )
     .parse_next(input)
 }
@@ -98,7 +98,7 @@ fn parse_ingredient_amount<'a>(
     input: &mut Input<'a>,
 ) -> PResult<(Option<&'a str>, Option<&'a str>)> {
     delimited(
-        terminated("(", space0),
+        ("(", space0),
         (
             opt(parse_quantity),
             opt(preceded(space0, parse_unit.map(|v| v.trim()))),
@@ -170,10 +170,10 @@ fn parse_space<'a>(input: &mut Input<'a>) -> PResult<&'a str> {
 
 fn parse_metadata<'a>(input: &mut Input<'a>) -> PResult<(&'a str, &'a str)> {
     preceded(
-        terminated(">>", space0),
+        (">>", space0),
         (
             take_while(1.., |c| c != ':'),
-            preceded(terminated(":", space0), take_until(0.., "\n")),
+            preceded((":", space0), take_until(0.., "\n")),
         ),
     )
     .parse_next(input)
@@ -314,7 +314,7 @@ pub fn recipe<'a>(input: &mut Input<'a>) -> PResult<(Vec<Token<'a>>, &'a str)> {
 ///
 /// println!("{result:?}");
 /// ```
-pub fn parse(input: &str) -> Result<Vec<Token<'_>>, ParseError<Located<&str>, ContextError>>{
+pub fn parse(input: &str) -> Result<Vec<Token<'_>>, ParseError<Located<&str>, ContextError>> {
     let input = Located::new(input);
     let out = recipe.parse(input).map(|(tokens, _)| tokens);
     out
