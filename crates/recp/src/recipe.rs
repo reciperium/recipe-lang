@@ -39,7 +39,7 @@ impl<'a> TryFrom<&'a str> for Recipe<'a> {
     fn try_from(value: &'a str) -> Result<Self, Self::Error> {
         let tokens = parse(value.trim());
         match tokens {
-            Ok((_, tokens)) => {
+            Ok(tokens) => {
                 let mut metadata = HashMap::new();
 
                 let mut ingredients = Vec::new();
