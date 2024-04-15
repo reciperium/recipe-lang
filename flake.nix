@@ -2,19 +2,10 @@
   description = "Recipe management cli";
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
-    crane = {
-      url = "github:ipetkov/crane";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-    dream2nix = {
-      url = "github:71/dream2nix/rust-ws-inherit-version";
-      inputs.crane.follows = "crane";
-    };
     nci = {
       url = "github:yusdacra/nix-cargo-integration";
       inputs = {
         nixpkgs.follows = "nixpkgs";
-        dream2nix.follows = "dream2nix";
       };
     };
     flake-parts = {
