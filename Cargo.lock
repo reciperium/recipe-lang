@@ -303,7 +303,7 @@ dependencies = [
 
 [[package]]
 name = "recipe-parser"
-version = "0.4.0"
+version = "0.4.1"
 dependencies = [
  "rstest",
  "serde",
@@ -313,7 +313,7 @@ dependencies = [
 
 [[package]]
 name = "recp"
-version = "0.4.0"
+version = "0.4.1"
 dependencies = [
  "Inflector",
  "clap",
