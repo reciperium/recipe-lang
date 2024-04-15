@@ -1,3 +1,9 @@
+## v0.4.1 (2024-04-15)
+
+### Fix
+
+- remove unnecessary parsers
+
 ## v0.4.0 (2024-04-15)
 
 ### Feat
