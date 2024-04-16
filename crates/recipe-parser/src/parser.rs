@@ -1,9 +1,7 @@
 use std::fmt::Display;
 
 use winnow::ascii::{line_ending, multispace0, space0};
-use winnow::combinator::{
-    alt, cut_err, delimited, eof, opt, preceded, repeat_till, rest,
-};
+use winnow::combinator::{alt, cut_err, delimited, eof, opt, preceded, repeat_till, rest};
 use winnow::error::{ContextError, ParseError, StrContext, StrContextValue};
 use winnow::token::{take_till, take_until, take_while};
 use winnow::{Located, PResult, Parser};
