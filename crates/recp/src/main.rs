@@ -74,8 +74,10 @@ fn main() {
                     }
                 }
                 println!("\n\n{}\n", style("Instructions").underlined().bold());
-                let instru: String = recipe.instructions.iter().filter_map(|instruct| {
-                    match instruct {
+                let instru: String = recipe
+                    .instructions
+                    .iter()
+                    .filter_map(|instruct| match instruct {
                         Token::Metadata { key: _, value: _ } => None,
                         Token::Ingredient {
                             name,
@@ -93,8 +95,8 @@ fn main() {
 
                         Token::Comment(_) => None,
                         Token::Backstory(_) => None,
-                    }
-                }).collect();
+                    })
+                    .collect();
 
                 println!("{}", instru.trim())
                 // println!("{}", recipe.instructions);
