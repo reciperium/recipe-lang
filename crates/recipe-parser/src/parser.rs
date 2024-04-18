@@ -1,7 +1,7 @@
 use std::fmt::Display;
 
-use winnow::ascii::{line_ending, multispace0, space0};
-use winnow::combinator::{alt, cut_err, delimited, eof, opt, preceded, repeat_till, rest};
+use winnow::ascii::{line_ending, multispace0, multispace1, space0};
+use winnow::combinator::{alt, cut_err, delimited, opt, preceded, repeat, rest};
 use winnow::error::{ContextError, ParseError, StrContext, StrContextValue};
 use winnow::token::{take_till, take_until, take_while};
 use winnow::{Located, PResult, Parser};
@@ -159,13 +159,6 @@ fn parse_word<'a>(input: &mut Input<'a>) -> PResult<&'a str> {
     take_till(1.., move |c| multispace.contains(c)).parse_next(input)
 }
 
-/// We need to identify the spaces, and use them as tokens.
-/// They are useful to rebuild the recipe
-fn parse_space<'a>(input: &mut Input<'a>) -> PResult<&'a str> {
-    let multispace = " \t\r\n";
-    take_while(0.., move |c| multispace.contains(c)).parse_next(input)
-}
-
 fn parse_metadata<'a>(input: &mut Input<'a>) -> PResult<(&'a str, &'a str)> {
     preceded(
         (">>", space0),
@@ -289,15 +282,13 @@ pub fn recipe_value<'a>(input: &mut Input<'a>) -> PResult<Token<'a>> {
         parse_comment.map(|v| Token::Comment(v)),
         "(".map(|v| Token::Word(v)),
         parse_word.map(|v| Token::Word(v)),
-        parse_space.map(|v| Token::Space(v)),
-        rest.map(|v| Token::Word(v)),
-        // eof.map(|_| Token::Space("")),
+        multispace1.map(|v| Token::Space(v)),
     ))
     .parse_next(input)
 }
 
-pub fn recipe<'a>(input: &mut Input<'a>) -> PResult<(Vec<Token<'a>>, &'a str)> {
-    repeat_till(0.., recipe_value, eof).parse_next(input)
+pub fn recipe<'a>(input: &mut Input<'a>) -> PResult<Vec<Token<'a>>> {
+    repeat(0.., recipe_value).parse_next(input)
 }
 
 /// Parse recipe tokens from a string
@@ -314,8 +305,7 @@ pub fn recipe<'a>(input: &mut Input<'a>) -> PResult<(Vec<Token<'a>>, &'a str)> {
 /// ```
 pub fn parse(input: &str) -> Result<Vec<Token<'_>>, ParseError<Located<&str>, ContextError>> {
     let input = Located::new(input);
-    let out = recipe.parse(input).map(|(tokens, _)| tokens);
-    out
+    recipe.parse(input)
 }
 
 #[cfg(test)]
@@ -527,17 +517,6 @@ mod test {
     }
 
     #[rstest]
-    #[case(" ", " ")]
-    #[case("\t", "\t")]
-    #[case("\r \t", "\r \t")]
-    #[case("\n", "\n")]
-    fn test_parse_space_ok(#[case] input: &str, #[case] expected: &str) {
-        let mut input = Located::new(input);
-        let space = parse_space(&mut input).expect("failed to parse space");
-        assert_eq!(space, expected)
-    }
-
-    #[rstest]
     #[case(" ", Token::Space(" "))]
     #[case("{holis}(100 gr)", Token::Ingredient { name: "holis", quantity: Some("100"), unit: Some("gr") })]
     fn test_recipe_value_ok(#[case] input: &str, #[case] expected: Token) {
@@ -550,7 +529,7 @@ mod test {
     fn test_recipe_ok() {
         let input = "Boil the quinoa for t{5 minutes} in a &{pot}.\nPut the boiled {quinoa}(200gr) in the base of the bowl.";
         let expected = "Boil the quinoa for 5 minutes in a pot.\nPut the boiled quinoa in the base of the bowl.";
-        let (recipe, _) = recipe.parse(Located::new(input)).expect("parse failed");
+        let recipe = recipe.parse(Located::new(input)).expect("parse failed");
         let fmt_recipe = recipe
             .iter()
             .fold(String::new(), |acc, val| format!("{acc}{val}"));
