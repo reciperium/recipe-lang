@@ -1,3 +1,9 @@
+## v0.4.3 (2024-04-18)
+
+### Fix
+
+- use repeat instead of repeat_till
+
 ## v0.4.2 (2024-04-16)
 
 ### Fix
