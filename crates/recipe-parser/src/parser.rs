@@ -193,6 +193,7 @@ fn parse_backstory<'a>(input: &mut Input<'a>) -> PResult<&'a str> {
 **************** */
 
 #[derive(Debug, Clone, Eq, PartialEq, Hash)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize))]
 pub enum Token<'a> {
     Metadata {
         key: &'a str,

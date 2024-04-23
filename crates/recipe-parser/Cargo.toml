@@ -12,7 +12,7 @@ homepage = { workspace = true }
 categories = ["command-line-interface", "parser-implementations"]
 
 [dependencies]
-serde = { version = "1.0", features = ["derive"] }
+serde = { version = "1", features = ["derive"], optional = true }
 winnow = "0.6.6"
 
 [dev-dependencies]
@@ -21,3 +21,6 @@ serde_json = "1.0"
 
 [lib]
 path = "src/lib.rs"
+
+[features]
+serde = ["dep:serde"]
