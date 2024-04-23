@@ -1,3 +1,9 @@
+## v0.5.0 (2024-04-23)
+
+### Fix
+
+- make serde optional and add serialize if enabled
+
 ## v0.4.3 (2024-04-18)
 
 ### Fix
