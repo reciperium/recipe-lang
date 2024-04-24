@@ -196,7 +196,7 @@ fn parse_backstory<'a>(input: &mut Input<'a>) -> PResult<&'a str> {
 #[cfg_attr(feature = "serde", derive(serde::Serialize))]
 #[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
 // if you use `zod` for example, using a tag makes it easy to use an undiscriminated union
-#[cfg_attr(feature = "serde", serde(tag = "token"))]
+#[cfg_attr(feature = "serde", serde(tag = "token", content = "content"))]
 pub enum Token<'a> {
     Metadata {
         key: &'a str,
@@ -582,8 +582,17 @@ mod test {
         let serialized = serde_json::to_string(&token).expect("failed to serialize");
         assert_eq!(
             serialized,
-            r#"{"token":"Ingredient","name":"quinoa","quantity":"200","unit":"gr"}"#
+            r#"{"token":"Ingredient","content":{"name":"quinoa","quantity":"200","unit":"gr"}}"#
         );
+    }
+
+    #[test]
+    #[cfg(feature = "serde")]
+    fn test_token_serialization_creates_right_payload_single_string() {
+        let token = Token::Word("holis");
+
+        let serialized = serde_json::to_string(&token).expect("failed to serialize");
+        assert_eq!(serialized, r#"{"token":"Word","content":"holis"}"#);
     }
 
     #[test]
