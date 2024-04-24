@@ -1,3 +1,20 @@
+## v0.6.0 (2024-04-24)
+
+### BREAKING CHANGE
+
+- The serialized output is no longer like
+```
+{"Ingredient": {"name": "foo", "amount": "1", "unit": "gr"}}
+```
+but instead
+```
+{"token": "Ingredient", "name": "foo", "amount": "1", "unit": "gr"}
+```
+
+### Feat
+
+- add tag to token and add support for json-schema
+
 ## v0.5.0 (2024-04-23)
 
 ### Fix
