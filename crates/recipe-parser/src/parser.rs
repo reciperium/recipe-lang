@@ -194,6 +194,9 @@ fn parse_backstory<'a>(input: &mut Input<'a>) -> PResult<&'a str> {
 
 #[derive(Debug, Clone, Eq, PartialEq, Hash)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize))]
+#[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
+// if you use `zod` for example, using a tag makes it easy to use an undiscriminated union
+#[cfg_attr(feature = "serde", serde(tag = "token"))]
 pub enum Token<'a> {
     Metadata {
         key: &'a str,
@@ -552,5 +555,42 @@ mod test {
 
         assert_eq!(expected, fmt_recipe);
         println!("{:?}", recipe);
+    }
+
+    #[test]
+    #[cfg(feature = "serde")]
+    fn test_token_serialization_works() {
+        let token = Token::Ingredient {
+            name: "quinoa",
+            quantity: Some("200"),
+            unit: Some("gr"),
+        };
+
+        let serialized = serde_json::to_string(&token).expect("failed to serialize");
+        println!("{}", serialized);
+    }
+
+    #[test]
+    #[cfg(feature = "serde")]
+    fn test_token_serialization_creates_right_payload() {
+        let token = Token::Ingredient {
+            name: "quinoa",
+            quantity: Some("200"),
+            unit: Some("gr"),
+        };
+
+        let serialized = serde_json::to_string(&token).expect("failed to serialize");
+        assert_eq!(
+            serialized,
+            r#"{"token":"Ingredient","name":"quinoa","quantity":"200","unit":"gr"}"#
+        );
+    }
+
+    #[test]
+    #[cfg(feature = "schemars")]
+    fn test_token_json_schema_generation() {
+        use schemars::schema_for;
+        let schema = schema_for!(Token);
+        println!("{}", serde_json::to_string_pretty(&schema).unwrap());
     }
 }

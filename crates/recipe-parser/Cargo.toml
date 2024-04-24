@@ -12,6 +12,7 @@ homepage = { workspace = true }
 categories = ["command-line-interface", "parser-implementations"]
 
 [dependencies]
+schemars = { version = "0.8.16", optional = true }
 serde = { version = "1", features = ["derive"], optional = true }
 winnow = "0.6.6"
 
@@ -23,4 +24,9 @@ serde_json = "1.0"
 path = "src/lib.rs"
 
 [features]
+
+# Adds serde Serialize implementation to Token
 serde = ["dep:serde"]
+
+# Add JsonSchema generation for Token
+schemars = ["dep:schemars"]
