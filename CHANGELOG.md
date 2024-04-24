@@ -1,3 +1,21 @@
+## v0.7.0 (2024-04-24)
+
+### BREAKING CHANGE
+
+- json output is no longer like:
+```json
+{"token": "Ingredient", "name": "foo", "amount": "1", "unit": "gr"}
+```
+now:
+```json
+{"token": "Ingredient", "content": {"name": "foo", "amount": "1", "unit": "gr"}}
+```
+The problem is that serde was failing to serialize enum variants that contained a single string
+
+### Fix
+
+- use serde content for token enum
+
 ## v0.6.0 (2024-04-24)
 
 ### BREAKING CHANGE
