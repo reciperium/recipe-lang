@@ -1,3 +1,9 @@
+## v0.8.1 (2024-05-27)
+
+### Fix
+
+- use proper feature for wasm
+
 ## v0.8.0 (2024-05-27)
 
 ### Feat
