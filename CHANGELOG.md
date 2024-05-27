@@ -1,3 +1,13 @@
+## v0.8.0 (2024-05-27)
+
+### Feat
+
+- add support for tsify under wasm feature
+
+### Fix
+
+- improve error messages
+
 ## v0.7.0 (2024-04-24)
 
 ### BREAKING CHANGE
