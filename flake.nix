@@ -31,7 +31,7 @@
         # system.
 
         nci.projects."recipe-lang" = {
-          relPath = "";
+          path = ./.;
           # export all crates (packages and devshell) in flake outputs
           # alternatively you can access the outputs and export them yourself
           export = true;
@@ -42,6 +42,7 @@
           "recp" = { };
           "recipe-parser" = { };
         };
+
         # export the project devshell as the default devshell
         devShells.default = config.nci.outputs."recipe-lang".devShell;
         # export the release package of the crate as default package
