@@ -197,8 +197,8 @@ fn parse_backstory<'a>(input: &mut Input<'a>) -> PResult<&'a str> {
 #[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
 // if you use `zod` for example, using a tag makes it easy to use an undiscriminated union
 #[cfg_attr(feature = "serde", serde(tag = "token", content = "content"))]
-#[cfg_attr(feature = "tsify", derive(tsify::Tsify))]
-#[cfg_attr(feature = "tsify", tsify(into_wasm_abi))]
+#[cfg_attr(feature = "wasm", derive(tsify::Tsify))]
+#[cfg_attr(feature = "wasm", tsify(into_wasm_abi))]
 pub enum Token<'a> {
     Metadata {
         key: &'a str,
