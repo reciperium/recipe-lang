@@ -101,8 +101,7 @@ fn parse_ingredient_amount<'a>(
             opt(parse_quantity),
             opt(preceded(space0, parse_unit.map(|v| v.trim()))),
         ),
-        cut_err(")").context(StrContext::Expected(StrContextValue::CharLiteral(')')))
-        // cut_err(")"),
+        cut_err(")").context(StrContext::Expected(StrContextValue::CharLiteral(')'))), // cut_err(")"),
     )
     // .context(StrContext::Expected(StrContextValue::CharLiteral('}')))
     .parse_next(input)
@@ -198,6 +197,8 @@ fn parse_backstory<'a>(input: &mut Input<'a>) -> PResult<&'a str> {
 #[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
 // if you use `zod` for example, using a tag makes it easy to use an undiscriminated union
 #[cfg_attr(feature = "serde", serde(tag = "token", content = "content"))]
+#[cfg_attr(feature = "tsify", derive(tsify::Tsify))]
+#[cfg_attr(feature = "tsify", tsify(into_wasm_abi))]
 pub enum Token<'a> {
     Metadata {
         key: &'a str,
@@ -437,17 +438,18 @@ mod test {
             Ok(_) => {
                 // should fail the test
                 assert!(false);
-            },
-            Err(e) => {
-                match e {
-                    winnow::error::ErrMode::Cut(err) => {
-                        println!("{}", err);
-                        assert_eq!("expected a quantity value, like 3, 1.2, 1/2 or 1_000", err.to_string());
-                        assert!(true);
-                    },
-                    _ => {
-                        assert!(false);
-                    }
+            }
+            Err(e) => match e {
+                winnow::error::ErrMode::Cut(err) => {
+                    println!("{}", err);
+                    assert_eq!(
+                        "expected a quantity value, like 3, 1.2, 1/2 or 1_000",
+                        err.to_string()
+                    );
+                    assert!(true);
+                }
+                _ => {
+                    assert!(false);
                 }
             },
         }
@@ -462,17 +464,15 @@ mod test {
             Ok(_) => {
                 // should fail the test
                 assert!(false);
-            },
-            Err(e) => {
-                match e {
-                    winnow::error::ErrMode::Cut(err) => {
-                        println!("{}", err);
-                        assert_eq!("expected `)`", err.to_string());
-                        assert!(true);
-                    },
-                    _ => {
-                        assert!(false);
-                    }
+            }
+            Err(e) => match e {
+                winnow::error::ErrMode::Cut(err) => {
+                    println!("{}", err);
+                    assert_eq!("expected `)`", err.to_string());
+                    assert!(true);
+                }
+                _ => {
+                    assert!(false);
                 }
             },
         }

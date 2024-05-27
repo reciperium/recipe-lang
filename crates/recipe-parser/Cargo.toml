@@ -12,9 +12,11 @@ homepage = { workspace = true }
 categories = ["command-line-interface", "parser-implementations"]
 
 [dependencies]
+winnow = "0.6"
 schemars = { version = "0.8.16", optional = true }
 serde = { version = "1", features = ["derive"], optional = true }
-winnow = "0.6"
+wasm-bindgen = {version = "0.2.92", optional = true}
+tsify = { version = "0.4.5", optional = true}
 
 [dev-dependencies]
 rstest = "0.17.0"
@@ -27,6 +29,7 @@ path = "src/lib.rs"
 
 # Adds serde Serialize implementation to Token
 serde = ["dep:serde"]
+wasm = ["dep:wasm-bindgen", "dep:tsify"]
 
 # Add JsonSchema generation for Token
 schemars = ["dep:schemars"]
