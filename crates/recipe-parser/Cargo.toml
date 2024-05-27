@@ -14,7 +14,7 @@ categories = ["command-line-interface", "parser-implementations"]
 [dependencies]
 schemars = { version = "0.8.16", optional = true }
 serde = { version = "1", features = ["derive"], optional = true }
-winnow = "0.6.6"
+winnow = "0.6"
 
 [dev-dependencies]
 rstest = "0.17.0"

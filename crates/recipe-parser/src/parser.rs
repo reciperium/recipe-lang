@@ -81,7 +81,7 @@ fn parse_quantity<'a>(input: &mut Input<'a>) -> PResult<&'a str> {
         }),
     )
     .context(StrContext::Expected(StrContextValue::Description(
-        "not a valid amount",
+        "a quantity value, like 3, 1.2, 1/2 or 1_000",
     )))
     .parse_next(input)
 }
@@ -101,9 +101,10 @@ fn parse_ingredient_amount<'a>(
             opt(parse_quantity),
             opt(preceded(space0, parse_unit.map(|v| v.trim()))),
         ),
-        cut_err(")"),
+        cut_err(")").context(StrContext::Expected(StrContextValue::CharLiteral(')')))
+        // cut_err(")"),
     )
-    .context(StrContext::Expected(StrContextValue::CharLiteral('}')))
+    // .context(StrContext::Expected(StrContextValue::CharLiteral('}')))
     .parse_next(input)
 }
 
@@ -429,13 +430,52 @@ mod test {
     #[rstest]
     #[case("()")]
     #[case("(unclosed")]
-    fn test_parse_ingredient_amount_wrong(#[case] input: String) {
+    fn test_parse_ingredient_amount_invalid_quantity(#[case] input: String) {
         let mut input = Located::new(input.as_str());
         let res = parse_ingredient_amount(&mut input);
+        match res {
+            Ok(_) => {
+                // should fail the test
+                assert!(false);
+            },
+            Err(e) => {
+                match e {
+                    winnow::error::ErrMode::Cut(err) => {
+                        println!("{}", err);
+                        assert_eq!("expected a quantity value, like 3, 1.2, 1/2 or 1_000", err.to_string());
+                        assert!(true);
+                    },
+                    _ => {
+                        assert!(false);
+                    }
+                }
+            },
+        }
+    }
 
-        println!("{res:?}");
-        assert!(res.is_err());
-        // let err = res.unwrap_err();
+    #[rstest]
+    #[case("(1.5")]
+    fn test_parse_ingredient_amount_invalid_amount(#[case] input: String) {
+        let mut input = Located::new(input.as_str());
+        let res = parse_ingredient_amount(&mut input);
+        match res {
+            Ok(_) => {
+                // should fail the test
+                assert!(false);
+            },
+            Err(e) => {
+                match e {
+                    winnow::error::ErrMode::Cut(err) => {
+                        println!("{}", err);
+                        assert_eq!("expected `)`", err.to_string());
+                        assert!(true);
+                    },
+                    _ => {
+                        assert!(false);
+                    }
+                }
+            },
+        }
     }
 
     #[rstest]
