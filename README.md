@@ -2,11 +2,12 @@
 
 [LOGO HERE](https://github.com/reciperium/recipe-lang/issues/1)
 
-> Write recipes understood by humans and machines
+> Write recipes understood by humans and machines, powering reciperium.com
 
-> **Warning**
+
+> [!WARNING]
 >
-> Recipe lang is in its infancy
+> Recipe lang is in its infancy, this may change unexpectedly
 
 ## About
 
@@ -53,7 +54,7 @@ Recipe lang supports:
 - Ingredients with the tag `{ingredient_name}` or with amount: `{ingredient_name}(200gr)`
 - Materials: `&{pot}`
 - Timers: `t{15 minutes}`
-- Recipe links: `@{woile/tomato-sauce}` (NOT IMPLEMENTED YET)
+- Recipe links: `@{woile/tomato-sauce}`
 - Metadata: with `>> tags: abc, easy, high-fiber`
 - Backstory: Separated by `---`, where you can add the history, see [examples/buddha-bowl.recp](examples/buddha-bowl.recp)
 - Comments: with `/* my comment */`
