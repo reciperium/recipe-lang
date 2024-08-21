@@ -44,7 +44,11 @@
         };
 
         # export the project devshell as the default devshell
-        devShells.default = config.nci.outputs."recipe-lang".devShell;
+        # devShells.default = config.nci.outputs."recipe-lang".devShell;
+        devShells.default = pkgs.mkShell {
+          inputsFrom = [ config.nci.outputs."recipe-lang".devShell ];
+          packages = [ pkgs.cargo-dist ];
+        };
         # export the release package of the crate as default package
         packages.default = config.nci.outputs."recp".packages.release;
         packages.recp = config.nci.outputs."recp".packages.release;
