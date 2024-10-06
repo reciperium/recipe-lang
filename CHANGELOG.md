@@ -1,3 +1,10 @@
+## v0.8.3 (2024-10-06)
+
+### Fix
+
+- parse backstory and word properly
+- update docs and flake
+
 ## v0.8.2 (2024-08-20)
 
 ### Fix
