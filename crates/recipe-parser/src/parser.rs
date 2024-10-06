@@ -1,8 +1,9 @@
 use std::fmt::Display;
 
-use winnow::ascii::{line_ending, multispace0, multispace1, space0};
+use winnow::ascii::{line_ending, multispace0, space0, space1};
 use winnow::combinator::{alt, cut_err, delimited, opt, preceded, repeat, rest};
 use winnow::error::{ContextError, ParseError, StrContext, StrContextValue};
+use winnow::stream::AsChar;
 use winnow::token::{take_till, take_until, take_while};
 use winnow::{Located, PResult, Parser};
 
@@ -155,8 +156,7 @@ fn parse_recipe_ref<'a>(
 
 /// Tokens are separated into words
 fn parse_word<'a>(input: &mut Input<'a>) -> PResult<&'a str> {
-    let multispace = " \t\r\n";
-    take_till(1.., move |c| multispace.contains(c)).parse_next(input)
+    take_till(1.., AsChar::is_space).parse_next(input)
 }
 
 fn parse_metadata<'a>(input: &mut Input<'a>) -> PResult<(&'a str, &'a str)> {
@@ -288,7 +288,7 @@ pub fn recipe_value<'a>(input: &mut Input<'a>) -> PResult<Token<'a>> {
         parse_comment.map(|v| Token::Comment(v)),
         "(".map(|v| Token::Word(v)),
         parse_word.map(|v| Token::Word(v)),
-        multispace1.map(|v| Token::Space(v)),
+        space1.map(|v| Token::Space(v)),
     ))
     .parse_next(input)
 }
@@ -583,6 +583,23 @@ mod test {
         println!("{:?}", recipe);
     }
 
+    #[rstest]
+    #[case("Foo. ")]
+    #[case("Foo.")]
+    #[case("Foo, bar")]
+    #[case("Foo,bar")]
+    #[case("Foo,")]
+    #[case("Foo, ")]
+    #[case("Foo,\n")]
+    #[case("Foo.\n")]
+    #[case("Foo.\nfoo")]
+    #[case("Foo,\nfoo")]
+    fn test_symbol_parsing(#[case] input: &str) {
+        let recipe_result = parse(input);
+
+        assert!(recipe_result.is_ok());
+    }
+
     #[test]
     fn test_parse_ok() {
         let input = "Boil the quinoa for t{5 minutes} in a &{pot}.\nPut the boiled {quinoa}(200gr) in the base of the bowl.";
@@ -594,6 +611,22 @@ mod test {
         println!("{}", fmt_recipe);
 
         assert_eq!(expected, fmt_recipe);
+        println!("{:?}", recipe);
+    }
+
+    #[test]
+    fn test_parse_with_backstory_ok() {
+        let input = "Foo. \n---\nA backstory";
+        let expected = vec![
+            Token::Word("Foo."),
+            Token::Space(" "),
+            Token::Backstory("A backstory"),
+        ];
+        let recipe = parse(input).expect("parse failed");
+
+        println!("{:?}", recipe);
+
+        assert_eq!(expected, recipe);
         println!("{:?}", recipe);
     }
 
