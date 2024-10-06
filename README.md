@@ -2,12 +2,12 @@
 
 [LOGO HERE](https://github.com/reciperium/recipe-lang/issues/1)
 
-> Write recipes understood by humans and machines, powering reciperium.com
+> Write recipes understood by humans and machines, powering [reciperium.com](https://www.reciperium.com)
 
 
 > [!WARNING]
 >
-> Recipe lang is in its infancy, this may change unexpectedly
+> Recipe lang is in its infancy, things may change unexpectedly
 
 ## About
 
