@@ -19,7 +19,7 @@ wasm-bindgen = {version = "0.2.92", optional = true}
 tsify = { version = "0.4.5", optional = true}
 
 [dev-dependencies]
-rstest = "0.17.0"
+rstest = "0.23.0"
 serde_json = "1.0"
 
 [lib]
