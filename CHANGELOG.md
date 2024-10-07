@@ -1,3 +1,9 @@
+## v0.8.4 (2024-10-07)
+
+### Fix
+
+- **parser**: properly handle spaces and multilines
+
 ## v0.8.3 (2024-10-06)
 
 ### Fix
