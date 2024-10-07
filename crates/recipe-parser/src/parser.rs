@@ -1,9 +1,8 @@
 use std::fmt::Display;
 
-use winnow::ascii::{line_ending, multispace0, space0, space1};
+use winnow::ascii::{line_ending, multispace0, multispace1, space0, space1};
 use winnow::combinator::{alt, cut_err, delimited, opt, preceded, repeat, rest};
 use winnow::error::{ContextError, ParseError, StrContext, StrContextValue};
-use winnow::stream::AsChar;
 use winnow::token::{take_till, take_until, take_while};
 use winnow::{Located, PResult, Parser};
 
@@ -156,7 +155,7 @@ fn parse_recipe_ref<'a>(
 
 /// Tokens are separated into words
 fn parse_word<'a>(input: &mut Input<'a>) -> PResult<&'a str> {
-    take_till(1.., AsChar::is_space).parse_next(input)
+    take_till(1.., (' ', '\t', '\r', '\n')).parse_next(input)
 }
 
 fn parse_metadata<'a>(input: &mut Input<'a>) -> PResult<(&'a str, &'a str)> {
@@ -289,6 +288,7 @@ pub fn recipe_value<'a>(input: &mut Input<'a>) -> PResult<Token<'a>> {
         "(".map(|v| Token::Word(v)),
         parse_word.map(|v| Token::Word(v)),
         space1.map(|v| Token::Space(v)),
+        multispace1.map(|v| Token::Space(v)),
     ))
     .parse_next(input)
 }
@@ -581,6 +581,19 @@ mod test {
 
         assert_eq!(expected, fmt_recipe);
         println!("{:?}", recipe);
+    }
+
+    #[rstest]
+    #[case(" ", vec![Token::Space(" ")])]
+    #[case("\n\nhello", vec![Token::Space("\n\n"), Token::Word("hello")])]
+    #[case("hello\n", vec![Token::Word("hello"), Token::Space("\n")])]
+    #[case(">> tags: hello\n\nhello", vec![Token::Metadata {key: "tags", value: "hello"}, Token::Space("\n\n"), Token::Word("hello")])]
+    #[case(">> source: https://hello.com\n>> tags: hello\n", vec![Token::Metadata {key: "source", value: "https://hello.com"}, Token::Space("\n"), Token::Metadata {key: "tags", value: "hello"}, Token::Space("\n")])]
+    #[case("{holis}(100 gr)", vec![Token::Ingredient { name: "holis", quantity: Some("100"), unit: Some("gr") }])]
+    fn test_recipe_cases_ok(#[case] input: &str, #[case] expected: Vec<Token>) {
+        let mut input = Located::new(input);
+        let token = recipe(&mut input).expect("failed to parse token");
+        assert_eq!(token, expected)
     }
 
     #[rstest]
