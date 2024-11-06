@@ -30,7 +30,12 @@ fn main() {
             for recipe_path in recipes {
                 let content =
                     fs::read_to_string(recipe_path).expect("Could not read the given file");
-                let recipe = Recipe::try_from(content.as_str()).expect("Failed parsing the recipe");
+                let recipe = Recipe::try_from(content.as_str());
+                if let Err(error) = recipe {
+                    eprintln!("Failed to parse the recipe file:\n\n{}", error);
+                    std::process::exit(1);
+                }
+                let recipe = recipe.unwrap();
                 if let Some(name) = recipe.name {
                     println!("{}\n", style(name.to_title_case()).bold().blue());
                 }
