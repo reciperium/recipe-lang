@@ -1,3 +1,10 @@
+## v0.8.6 (2025-01-30)
+
+### Fix
+
+- **flake**: properly createa a rust toolchain
+- parse ingredients when connected to a word by `'` or ```
+
 ## v0.8.5 (2024-11-06)
 
 ### Fix
