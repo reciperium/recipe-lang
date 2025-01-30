@@ -155,7 +155,7 @@ fn parse_recipe_ref<'a>(
 
 /// Tokens are separated into words
 fn parse_word<'a>(input: &mut Input<'a>) -> PResult<&'a str> {
-    take_till(1.., (' ', '\t', '\r', '\n')).parse_next(input)
+    take_till(1.., (' ', '\t', '\r', '\n', '\'', '`')).parse_next(input)
 }
 
 fn parse_metadata<'a>(input: &mut Input<'a>) -> PResult<(&'a str, &'a str)> {
@@ -187,6 +187,20 @@ fn parse_backstory<'a>(input: &mut Input<'a>) -> PResult<&'a str> {
     .parse_next(input)
 }
 
+/// Symbols that create conflict when parsing
+///
+/// If you have a recipe like:
+///
+/// ```recp
+/// Take the l'{ingredient}
+/// ```
+///
+/// There's a word connected to the ingredient by a symbol, in order to be prevent
+/// the `parse_word` from ingesting the chunk `l'{ingredient}` as a word, we need
+/// to tell `parse_word` to stop at this character and also we need to catch it here.
+fn parse_special_symbols<'a>(input: &mut Input<'a>) -> PResult<&'a str> {
+    alt(("(", "'", "`")).parse_next(input)
+}
 /* ****************
 * The main parser
 **************** */
@@ -285,7 +299,7 @@ pub fn recipe_value<'a>(input: &mut Input<'a>) -> PResult<Token<'a>> {
         }),
         parse_backstory.map(|v| Token::Backstory(v)),
         parse_comment.map(|v| Token::Comment(v)),
-        "(".map(|v| Token::Word(v)),
+        parse_special_symbols.map(|v| Token::Word(v)),
         parse_word.map(|v| Token::Word(v)),
         space1.map(|v| Token::Space(v)),
         multispace1.map(|v| Token::Space(v)),
@@ -625,6 +639,53 @@ mod test {
 
         assert_eq!(expected, fmt_recipe);
         println!("{:?}", recipe);
+    }
+
+    #[rstest]
+    #[case("l'{ingredient}", vec![
+        Token::Word("l"),
+        Token::Word("'"),
+        Token::Ingredient {
+            name: "ingredient",
+            quantity: None,
+            unit: None,
+        },
+    ])]
+    #[case("l'&{material}", vec![
+        Token::Word("l"),
+        Token::Word("'"),
+        Token::Material("material"),
+    ])]
+    #[case("l't{mytimer}", vec![
+        Token::Word("l"),
+        Token::Word("'"),
+        Token::Timer("mytimer"),
+    ])]
+    #[case("l`{ingredient}", vec![
+        Token::Word("l"),
+        Token::Word("`"),
+        Token::Ingredient {
+            name: "ingredient",
+            quantity: None,
+            unit: None,
+        },
+    ])]
+    #[case("l`&{material}", vec![
+        Token::Word("l"),
+        Token::Word("`"),
+        Token::Material("material"),
+    ])]
+    #[case("l`t{mytimer}", vec![
+        Token::Word("l"),
+        Token::Word("`"),
+        Token::Timer("mytimer"),
+    ])]
+    fn test_parse_ingredients_without_spaces(#[case] input: &str, #[case] expected: Vec<Token>) {
+        let recipe = parse(input).expect("parse failed");
+
+        println!("{:?}", recipe);
+
+        assert_eq!(expected, recipe);
     }
 
     #[test]
