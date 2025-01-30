@@ -205,6 +205,7 @@ fn parse_special_symbols<'a>(input: &mut Input<'a>) -> PResult<&'a str> {
 * The main parser
 **************** */
 
+/// A recipe string is parsed into many of these tokens
 #[derive(Debug, Clone, Eq, PartialEq, Hash)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize))]
 #[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
@@ -213,26 +214,74 @@ fn parse_special_symbols<'a>(input: &mut Input<'a>) -> PResult<&'a str> {
 #[cfg_attr(feature = "wasm", derive(tsify::Tsify))]
 #[cfg_attr(feature = "wasm", tsify(into_wasm_abi))]
 pub enum Token<'a> {
+    /// Relevant information of a recipe that doesn't make the recipe itself
+    ///
+    /// Example:
+    /// ```recp
+    /// >> name: Salad
+    /// ```
     Metadata {
         key: &'a str,
         value: &'a str,
     },
+
+    /// Represents a recipe ingredient
+    ///
+    /// Example
+    ///
+    /// ```recp
+    /// {tomato}(1 kg)
+    /// ```
     Ingredient {
         name: &'a str,
         quantity: Option<&'a str>,
         unit: Option<&'a str>,
     },
-    // Reference to another recipe
+
+    /// Link to another recipe
+    ///
+    /// Example
+    ///
+    /// ```recp
+    /// @{path/recipe}(30 ml)
+    /// ```
     RecipeRef {
         name: &'a str,
         quantity: Option<&'a str>,
         unit: Option<&'a str>,
     },
+
+    /// Mark for a timer
+    ///
+    /// Example
+    ///
+    /// ```recp
+    /// t{25 minutes}
+    /// ```
     Timer(&'a str),
+
+    /// Mark for a material required
+    ///
+    /// Example
+    ///
+    /// ```recp
+    /// &{blender}
+    /// ```
     Material(&'a str),
+
     Word(&'a str),
     Space(&'a str),
     Comment(&'a str),
+
+    /// Information, story or notes about a recipe
+    ///
+    /// Example
+    ///
+    /// ```recp
+    /// my recipe
+    /// ---
+    /// shared by my best friend
+    /// ```
     Backstory(&'a str),
 }
 
