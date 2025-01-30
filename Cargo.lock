@@ -343,7 +343,7 @@ dependencies = [
 
 [[package]]
 name = "recipe-parser"
-version = "0.8.6"
+version = "0.8.7"
 dependencies = [
  "rstest",
  "schemars",
@@ -356,7 +356,7 @@ dependencies = [
 
 [[package]]
 name = "recp"
-version = "0.8.6"
+version = "0.8.7"
 dependencies = [
  "Inflector",
  "clap",
