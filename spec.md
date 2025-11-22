@@ -142,8 +142,7 @@ I learnt this recipe while traveling around Italy (2016), in a town called Sorre
 ```
 
 The backstory in this case would be parsed as:
+
 > I learnt this recipe while traveling around Italy (2016), in a town called Sorrento
 
 We can see how the `---` is separating the backstory from the actual recipe.
-
-The backstory **should** use [commonMark](https://spec.commonmark.org/) (A strongly defined, highly compatible specification of Markdown).
