@@ -1,3 +1,10 @@
+## v0.9.0 (2025-11-23)
+
+### Fix
+
+- update dependencies
+- remove commonmark from backstory
+
 ## v0.8.7 (2025-01-30)
 
 ### Fix
