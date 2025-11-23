@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 
-use recipe_parser::{parse, Token};
+use recipe_parser::{Token, parse};
 
 #[derive(Debug, Clone, Eq, PartialEq)]
 pub struct Ingredient {

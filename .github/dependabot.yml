@@ -1,0 +1,32 @@
+version: 2
+updates:
+  # Maintain Rust dependencies
+  - package-ecosystem: "cargo"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "06:00"
+    cooldown:
+      default-days: 7
+
+    # Group all Rust updates into one PR
+    groups:
+      all-cargo-dependencies:
+        patterns:
+          - "*"
+
+  # Maintain GitHub Actions (e.g., actions/checkout)
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "monthly"
+      day: "monday"
+      time: "06:00"
+    cooldown:
+      default-days: 7
+    # Group all Action updates into one PR
+    groups:
+      all-actions-dependencies:
+        patterns:
+          - "*"

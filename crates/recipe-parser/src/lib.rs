@@ -1,4 +1,4 @@
 mod parser;
 
-pub use parser::parse;
 pub use parser::Token;
+pub use parser::parse;
