@@ -65,9 +65,10 @@
           # devShells.default = config.nci.outputs."recipe-lang".devShell;
           devShells.default = pkgs.mkShell {
             inputsFrom = [ config.nci.outputs."recipe-lang".devShell ];
-            packages = [
-              pkgs.cargo-dist
-              pkgs.rustup
+            packages = with pkgs; [
+              cargo-dist
+              # rustup
+              commitizen
               inputs'.fenix.packages.default.toolchain
             ];
           };

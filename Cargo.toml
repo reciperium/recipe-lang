@@ -7,7 +7,7 @@ resolver = "2"
 
 [workspace.package]
 version = "0.8.7"
-edition = "2021"
+edition = "2024"
 description = "Write recipes understood by humans and machines"
 keywords = ["recipes", "cooking", "markup-language", "recipe-lang"]
 license = "MIT"
@@ -34,6 +34,9 @@ targets = [
 pr-run-mode = "skip"
 # Whether to install an updater program
 install-updater = true
+
+[workspace.dependencies]
+recipe-parser = { path = "crates/recipe-parser", version = "0.8.7" }
 
 # The profile that 'cargo dist' will build with
 [profile.dist]
