@@ -1,3 +1,9 @@
+## v0.9.5 (2026-01-19)
+
+### Fix
+
+- **deps**: bump serde_json in the all-cargo-dependencies group (#25)
+
 ## v0.9.4 (2026-01-12)
 
 ### Fix

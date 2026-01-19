@@ -6,7 +6,7 @@ members = [
 resolver = "2"
 
 [workspace.package]
-version = "0.9.4"
+version = "0.9.5"
 edition = "2024"
 description = "Write recipes understood by humans and machines"
 keywords = ["recipes", "cooking", "markup-language", "recipe-lang"]
@@ -33,7 +33,7 @@ install-updater = true
 install-path = "CARGO_HOME"
 
 [workspace.dependencies]
-recipe-parser = { path = "crates/recipe-parser", version = "0.9.4" }
+recipe-parser = { path = "crates/recipe-parser", version = "0.9.5" }
 
 # The profile that 'cargo dist' will build with
 [profile.dist]
