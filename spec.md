@@ -1,6 +1,6 @@
 # Recipe lang
 
-Version `0.1.0`
+Version `0.2.0`
 
 ## Language spec
 
@@ -46,11 +46,18 @@ I developed this recipe while living in Amsterdam
 
 ### Ingredients
 
+An *ingredient* is introduced by an open curly brace `{`, followed by a non‑empty sequence of Unicode characters that does **not** contain an unescaped `}`, and closed by `}`. The text inside the braces (called *the ingredient name*), is the only part parsed as an ingredient.
+An optional **amount** may immediately follow the closing brace: `{}( <quantity> [ <unit> ])?`. The whole construct is written as `{<name>}` or `{<name>}(...)`.
+Because no whitespace is required, a token can be concatenated directly with adjacent identifiers. In such cases **only** the characters between the matching braces constitute the ingredient; everything outside those braces belongs to surrounding prose.
+
 Ingredients should be surrounded by curly braces `{}`. Inside you can have any utf-8 value.
 After the curly braces `{}`, the amount can be optionally added, which should be surrounded by parenthesis `()`. There is no separation between the curly braces and parenthesis `{}()`.
 The **amount** is composed by **quantity** and **unit**, which are both optional.
 The **quantity** represents a numerical value like: `1` or `1/2`.
 The **unit** represents a system of measurement, e.g: `kg`, `grams`, `cup`. The preferred system is to use the SI (International System of Units), which is the metric system.
+
+Either an ingredient `{}` or ingredient+amount `{}()` don't have to be surrounded by spaces.
+This is valid syntax `foo{bar}` or `{foo}bar`, and only `foo` would be interpreted as an ingredient. This adds support for languages like Japanese and Mandarin, which don't use spaces between words. It's up to the user to write syntactically correct prose.
 
 ```
 {salt}
