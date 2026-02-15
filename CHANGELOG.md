@@ -1,3 +1,15 @@
+## v0.10.0 (2026-02-15)
+
+### Feat
+
+- **parser**: comply with spec updates
+- **spec**: update ingredient spaces before and after
+
+### Fix
+
+- bump dependencies
+- bump dependencies
+
 ## v0.9.5 (2026-01-19)
 
 ### Fix
