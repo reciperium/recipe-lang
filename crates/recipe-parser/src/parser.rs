@@ -1,9 +1,8 @@
 use std::fmt::Display;
-
 use winnow::ascii::{line_ending, multispace0, multispace1, space0, space1};
-use winnow::combinator::{alt, cut_err, delimited, opt, preceded, repeat};
+use winnow::combinator::{alt, cut_err, delimited, not, opt, preceded, repeat};
 use winnow::error::{ContextError, ParseError, StrContext, StrContextValue};
-use winnow::token::{rest, take_till, take_until, take_while};
+use winnow::token::{any, rest, take_until, take_while};
 use winnow::{LocatingSlice, ModalResult, Parser};
 
 type Input<'a> = LocatingSlice<&'a str>;
@@ -153,9 +152,19 @@ fn parse_recipe_ref<'a>(
     preceded("@", (parse_curly, opt(parse_ingredient_amount))).parse_next(input)
 }
 
-/// Tokens are separated into words
 fn parse_word<'a>(input: &mut Input<'a>) -> ModalResult<&'a str> {
-    take_till(1.., (' ', '\t', '\r', '\n', '\'', '`')).parse_next(input)
+    repeat(
+        1..,
+        (
+            not(alt((
+                " ", "\t", "\r", "\n", "'", "`", "{", "t{", "&{", "@{",
+            ))),
+            any,
+        ),
+    )
+    .map(|()| ())
+    .take()
+    .parse_next(input)
 }
 
 fn parse_metadata<'a>(input: &mut Input<'a>) -> ModalResult<(&'a str, &'a str)> {
@@ -367,7 +376,7 @@ pub fn recipe<'a>(input: &mut Input<'a>) -> ModalResult<Vec<Token<'a>>> {
 /// ```
 /// use recipe_parser::parse;
 ///
-/// let input = "Take the {potatoe}(1) and boil it";
+/// let input = "Take the {potato}(1) and boil it";
 /// let result = parse(input).expect("recipe could not be parsed");
 ///
 /// println!("{result:?}");
@@ -731,7 +740,23 @@ mod test {
         Token::Word("`"),
         Token::Timer("mytimer"),
     ])]
-    fn test_parse_ingredients_without_spaces(#[case] input: &str, #[case] expected: Vec<Token>) {
+    #[case("foot{timer}", vec![
+        Token::Word("foo"),
+        Token::Timer("timer")
+    ])]
+    #[case("煮{白飯}(100 g)", vec![
+        Token::Word("煮"),
+        Token::Ingredient {
+            name: "白飯",
+            quantity: Some("100"),
+            unit: Some("g"),
+        },
+    ])]
+    #[case("煮t{mytimer}", vec![
+        Token::Word("煮"),
+        Token::Timer("mytimer"),
+    ])]
+    fn test_parse_chunks_without_spaces(#[case] input: &str, #[case] expected: Vec<Token>) {
         let recipe = parse(input).expect("parse failed");
 
         println!("{:?}", recipe);
