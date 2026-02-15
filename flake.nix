@@ -37,10 +37,8 @@
       perSystem =
         {
           config,
-          self',
           inputs',
           pkgs,
-          system,
           ...
         }:
         {
@@ -69,7 +67,7 @@
               cargo-dist
               # rustup
               commitizen
-              inputs'.fenix.packages.default.toolchain
+              inputs'.fenix.packages.stable.toolchain
             ];
           };
           # export the release package of the crate as default package
