@@ -1,3 +1,9 @@
+## v0.10.1 (2026-02-19)
+
+### Fix
+
+- **deps**: bump the all-cargo-dependencies group with 2 updates (#30)
+
 ## v0.10.0 (2026-02-15)
 
 ### Feat
