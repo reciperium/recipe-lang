@@ -1,3 +1,9 @@
+## v0.10.2 (2026-02-23)
+
+### Fix
+
+- **deps**: bump clap in the all-cargo-dependencies group (#32)
+
 ## v0.10.1 (2026-02-19)
 
 ### Fix
