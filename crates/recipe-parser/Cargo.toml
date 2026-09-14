@@ -12,14 +12,14 @@ homepage = { workspace = true }
 categories = ["command-line-interface", "parser-implementations"]
 
 [dependencies]
-winnow = "0.7"
+winnow = "1.0"
 schemars = { version = "1", optional = true }
 serde = { version = "1", features = ["derive"], optional = true }
 wasm-bindgen = {version = "0.2.105", optional = true}
 tsify = { version = "0.5", optional = true}
 
 [dev-dependencies]
-rstest = "0.26"
+rstest = "0.27"
 serde_json = "1"
 
 [lib]
